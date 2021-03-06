@@ -5,6 +5,7 @@
 #include <termios.h>
 #include <crc16.h>
 #include <stdlib.h>
+#include <math.h>  
 
  
 char *substring(unsigned char *string, int position, int length)
@@ -110,13 +111,55 @@ int main() {
         count = write(uart0_filestream, &msg[0], 5);
     }
     else if (option == 4) {
-        // unsigned char code_string[9] = {0x01, 0x23, 0xA3, 0x5, "t", "e", "s", "t", "e"};
-        // short crc = calcula_CRC(code_string, 9);
+        unsigned char code_string[4] = {0x01, 0x16, 0xB1};
 
-        // unsigned char msg[9];
-        // memcpy(msg, &code_string, 9);
-        // memcpy(&msg[3], &crc, 2);
-        // count = write(uart0_filestream, &msg[0], 5);
+        int i = 1817;
+        memcpy(&code_string[3], &i, sizeof(i));
+
+        short crc = calcula_CRC(code_string, 7);
+
+        unsigned char msg[9];
+        memcpy(msg, &code_string, 7);
+        memcpy(&msg[7], &crc, 2);
+
+        for(int i = 0; i < 9; i++) {
+            printf("%x ", msg[i]);
+        }
+        count = write(uart0_filestream, &msg[0], 9);
+    }
+    else if (option == 5) {
+        unsigned char code_string[4] = {0x01, 0x16, 0xB2};
+
+        float valueFloat = 1.77f;
+        memcpy(&code_string[3], &valueFloat, sizeof(valueFloat));
+
+        short crc = calcula_CRC(code_string, 7);
+
+        unsigned char msg[9];
+        memcpy(msg, &code_string, 7);
+        memcpy(&msg[7], &crc, 2);
+
+        for(int i = 0; i < 9; i++) {
+            printf("%x ", msg[i]);
+        }
+        count = write(uart0_filestream, &msg[0], 9);
+    }
+    else if (option == 6) {
+        unsigned char code_string[7] = {0x01, 0x16, 0xB3};
+
+        char stringMessage[5] = {0x03, 'B', 'o', 'a'};
+        memcpy(&code_string[3], &stringMessage, 4);
+
+        short crc = calcula_CRC(code_string, 7);
+
+        unsigned char msg[9];
+        memcpy(msg, &code_string, 7);
+        memcpy(&msg[7], &crc, 2);
+
+        for(int i = 0; i < 10; i++) {
+            printf("%x ", msg[i]);
+        }
+        count = write(uart0_filestream, &msg[0], 9);
     }
 
 
@@ -131,7 +174,7 @@ int main() {
 
     // READ FROM MODBUS
 
-    sleep(1);
+    sleep(4);
 
     if (uart0_filestream != -1) {
         // buffer to read
@@ -141,6 +184,7 @@ int main() {
 
         char *new_string = malloc(sizeof(char)*rx_length - 4);
 
+        printf("%d\n", rx_length);
         if (rx_length < 0)
         {
             printf("Error during read of UART - RX\n");
@@ -153,19 +197,19 @@ int main() {
         {
             rx_buffer[rx_length] = '\0';
             new_string = substring(rx_buffer, 4, rx_length - 2);
-            if (option == 1) {
+            if (option == 1 || option == 4) {
                 int currentInteger = 0;
                 memcpy(&currentInteger, new_string, strlen(new_string));
 
                 printf("int: %d\n", currentInteger);
             }
-            else if (option == 2) {
+            else if (option == 2 || option == 5) {
                 float currentFloat = 0;
                 memcpy(&currentFloat, new_string, strlen(new_string));
 
                 printf("float: %f\n", currentFloat);
             }
-            else if (option == 3) {
+            else if (option == 3 || option == 6) {
                 printf("string: %s\n", new_string);
             }
         }
