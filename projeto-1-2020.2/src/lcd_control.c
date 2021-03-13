@@ -1,4 +1,3 @@
-
 /*
 *
 * by Lewis Loflin www.bristolwatch.com lewis@bvu.net
@@ -12,6 +11,7 @@
 * There is no warrenty of any kind use at your own risk.
 *
 */
+
 #include <lcd_control.h>
 
 // Define some device parameters
@@ -68,9 +68,9 @@ void typeln(const char *s)   {
 }
 
 // float to string
-void typeFloat(float myFloat)   {
+void typeDouble(double currentDouble)   {
   char buffer[20];
-  sprintf(buffer, "%4.2f",  myFloat);
+  sprintf(buffer, "%4.2lf",  currentDouble);
   typeln(buffer);
 }
 
@@ -117,7 +117,11 @@ void printInScreen(const char *line1Print, const char *line2Print) {
     ClrLcd(); // clear display
 
     lcdLoc(LINE1);
-    typeln(line1Print);
+    typeln("TE: ");
+    typeDouble(2.7);
+    typeln("TI: ");
+    typeDouble(2.7);
     lcdLoc(LINE2);
-    typeln(line2Print);
+    typeln("TR: ");
+    typeDouble(2.7);
 }
