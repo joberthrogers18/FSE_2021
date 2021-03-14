@@ -2,6 +2,8 @@
     "files.associations": {
         "*.jsx": "Javascript React",
         "*.js": "javascriptreact",
-        "lcd_control.h": "c"
+        "lcd_control.h": "c",
+        "read_bme280.h": "c",
+        "stdlib.h": "c"
     }
 }
