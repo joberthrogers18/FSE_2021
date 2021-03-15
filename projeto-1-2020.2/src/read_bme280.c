@@ -1,318 +1,516 @@
-/**\
- * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
- *
- * SPDX-License-Identifier: BSD-3-Clause
- **/
+// /**
+//  * Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
+//  *
+//  * SPDX-License-Identifier: BSD-3-Clause
+//  **/
 
-/**
- * \ingroup bme280
- * \defgroup bme280Examples Examples
- * @brief Reference Examples
- */
+// /**
+//  * \ingroup bme280
+//  * \defgroup bme280Examples Examples
+//  * @brief Reference Examples
+//  */
 
-/*!
- * @ingroup bme280Examples
- * @defgroup bme280GroupExampleLU linux_userspace
- * @brief Linux userspace test code, simple and mose code directly from the doco.
- * compile like this: gcc linux_userspace.c ../bme280.c -I ../ -o bme280
- * tested: Raspberry Pi.
- * Use like: ./bme280 /dev/i2c-0
- * \include linux_userspace.c
- */
+// /*!
+//  * @ingroup bme280Examples
+//  * @defgroup bme280GroupExampleLU linux_userspace
+//  * @brief Linux userspace test code, simple and mose code directly from the doco.
+//  * compile like this: gcc linux_userspace.c ../bme280.c -I ../ -o bme280
+//  * tested: Raspberry Pi.
+//  * Use like: ./bme280 /dev/i2c-0
+//  * \include linux_userspace.c
+//  */
 
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
+// #include <linux/i2c-dev.h>
+// #include <sys/ioctl.h>
 
-/******************************************************************************/
-/*!                         System header files                               */
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+// /******************************************************************************/
+// /*!                         System header files                               */
+// #include <string.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <unistd.h>
+// #include <sys/types.h>
+// #include <fcntl.h>
+
+// /******************************************************************************/
+// /*!                         Own header files                                  */
+// #include "bme280.h"
+
+// /******************************************************************************/
+// /*!                               Structures                                  */
+
+// /* Structure that contains identifier details used in example */
+// struct identifier
+// {
+//     /* Variable to hold device address */
+//     uint8_t dev_addr;
+
+//     /* Variable that contains file descriptor */
+//     int8_t fd;
+// };
+
+// /****************************************************************************/
+// /*!                         Functions                                       */
+
+// /*!
+//  *  @brief Function that creates a mandatory delay required in some of the APIs.
+//  *
+//  * @param[in] period              : Delay in microseconds.
+//  * @param[in, out] intf_ptr       : Void pointer that can enable the linking of descriptors
+//  *                                  for interface related call backs
+//  *  @return void.
+//  *
+//  */
+// void user_delay_us(uint32_t period, void *intf_ptr);
+
+// /*!
+//  * @brief Function for print the temperature, humidity and pressure data.
+//  *
+//  * @param[out] comp_data    :   Structure instance of bme280_data
+//  *
+//  * @note Sensor data whose can be read
+//  *
+//  * sens_list
+//  * --------------
+//  * Pressure
+//  * Temperature
+//  * Humidity
+//  *
+//  */
+// void print_sensor_data(struct bme280_data *comp_data);
+
+// /*!
+//  *  @brief Function for reading the sensor's registers through I2C bus.
+//  *
+//  *  @param[in] reg_addr       : Register address.
+//  *  @param[out] data          : Pointer to the data buffer to store the read data.
+//  *  @param[in] len            : No of bytes to read.
+//  *  @param[in, out] intf_ptr  : Void pointer that can enable the linking of descriptors
+//  *                                  for interface related call backs.
+//  *
+//  *  @return Status of execution
+//  *
+//  *  @retval 0 -> Success
+//  *  @retval > 0 -> Failure Info
+//  *
+//  */
+// int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr);
+
+// /*!
+//  *  @brief Function for writing the sensor's registers through I2C bus.
+//  *
+//  *  @param[in] reg_addr       : Register address.
+//  *  @param[in] data           : Pointer to the data buffer whose value is to be written.
+//  *  @param[in] len            : No of bytes to write.
+//  *  @param[in, out] intf_ptr  : Void pointer that can enable the linking of descriptors
+//  *                                  for interface related call backs
+//  *
+//  *  @return Status of execution
+//  *
+//  *  @retval BME280_OK -> Success
+//  *  @retval BME280_E_COMM_FAIL -> Communication failure.
+//  *
+//  */
+// int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr);
+
+// /*!
+//  * @brief Function reads temperature, humidity and pressure data in forced mode.
+//  *
+//  * @param[in] dev   :   Structure instance of bme280_dev.
+//  *
+//  * @return Result of API execution status
+//  *
+//  * @retval BME280_OK - Success.
+//  * @retval BME280_E_NULL_PTR - Error: Null pointer error
+//  * @retval BME280_E_COMM_FAIL - Error: Communication fail error
+//  * @retval BME280_E_NVM_COPY_FAILED - Error: NVM copy failed
+//  *
+//  */
+// int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev);
+
+// /*!
+//  * @brief This function starts execution of the program.
+//  */
+// void read_from_bme() {
+//     struct bme280_dev dev;
+
+//     struct identifier id;
+
+//     /* Variable to define the result */
+//     int8_t rslt = BME280_OK;
+
+//     if ((id.fd = open("/dev/i2c-1", O_RDWR)) < 0)
+//     {
+//         fprintf(stderr, "Failed to open the i2c bus\n");
+//         exit(1);
+//     }
+
+//     /* Make sure to select BME280_I2C_ADDR_PRIM or BME280_I2C_ADDR_SEC as needed */
+//     /* ME280_I2C_ADDR_PRIM: 0x76 */
+//     id.dev_addr = BME280_I2C_ADDR_PRIM;
+
+//     dev.intf = BME280_I2C_INTF;
+//     dev.read = user_i2c_read;
+//     dev.write = user_i2c_write;
+//     dev.delay_us = user_delay_us;
+
+//     /* Update interface pointer with the structure that contains both device address and file descriptor */
+//     dev.intf_ptr = &id;
+
+//     if (ioctl(id.fd, I2C_SLAVE, id.dev_addr) < 0)
+//     {
+//         fprintf(stderr, "Failed to acquire bus access and/or talk to slave.\n");
+//         exit(1);
+//     }
+
+//     /* Initialize the bme280 */
+//     rslt = bme280_init(&dev);
+//     if (rslt != BME280_OK)
+//     {
+//         fprintf(stderr, "Failed to initialize the device (code %+d).\n", rslt);
+//         exit(1);
+//     }
+
+//     rslt = stream_sensor_data_forced_mode(&dev);
+//     if (rslt != BME280_OK)
+//     {
+//         fprintf(stderr, "Failed to stream sensor data (code %+d).\n", rslt);
+//         exit(1);
+//     }
+// }
+
+// /*!
+//  * @brief This function reading the sensor's registers through I2C bus.
+//  */
+// int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr)
+// {
+//     struct identifier id;
+
+//     id = *((struct identifier *)intf_ptr);
+
+//     write(id.fd, &reg_addr, 1);
+//     read(id.fd, data, len);
+
+//     return 0;
+// }
+
+// /*!
+//  * @brief This function provides the delay for required time (Microseconds) as per the input provided in some of the
+//  * APIs
+//  */
+// void user_delay_us(uint32_t period, void *intf_ptr)
+// {
+//     usleep(period);
+// }
+
+// /*!
+//  * @brief This function for writing the sensor's registers through I2C bus.
+//  */
+// int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
+// {
+//     uint8_t *buf;
+//     struct identifier id;
+
+//     id = *((struct identifier *)intf_ptr);
+
+//     buf = malloc(len + 1);
+//     buf[0] = reg_addr;
+//     memcpy(buf + 1, data, len);
+//     if (write(id.fd, buf, len + 1) < (uint16_t)len)
+//     {
+//         return BME280_E_COMM_FAIL;
+//     }
+
+//     free(buf);
+
+//     return BME280_OK;
+// }
+
+// /*!
+//  * @brief This API used to print the sensor temperature, pressure and humidity data.
+//  */
+// void print_sensor_data(struct bme280_data *comp_data)
+// {
+//     float temp, press, hum;
+
+// #ifdef BME280_FLOAT_ENABLE
+//     temp = comp_data->temperature;
+//     press = 0.01 * comp_data->pressure;
+//     hum = comp_data->humidity;
+// #else
+// #ifdef BME280_64BIT_ENABLE
+//     temp = 0.01f * comp_data->temperature;
+//     press = 0.0001f * comp_data->pressure;
+//     hum = 1.0f / 1024.0f * comp_data->humidity;
+// #else
+//     temp = 0.01f * comp_data->temperature;
+//     press = 0.01f * comp_data->pressure;
+//     hum = 1.0f / 1024.0f * comp_data->humidity;
+// #endif
+// #endif
+//     printf("%0.2lf deg C, %0.2lf hPa, %0.2lf%%\n", temp, press, hum);
+// }
+
+// /*!
+//  * @brief This API reads the sensor temperature, pressure and humidity data in forced mode.
+//  */
+// int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev)
+// {
+//     /* Variable to define the result */
+//     int8_t rslt = BME280_OK;
+
+//     /* Variable to define the selecting sensors */
+//     uint8_t settings_sel = 0;
+
+//     /* Variable to store minimum wait time between consecutive measurement in force mode */
+//     uint32_t req_delay;
+
+//     /* Structure to get the pressure, temperature and humidity values */
+//     struct bme280_data comp_data;
+
+//     /* Recommended mode of operation: Indoor navigation */
+//     dev->settings.osr_h = BME280_OVERSAMPLING_1X;
+//     dev->settings.osr_p = BME280_OVERSAMPLING_16X;
+//     dev->settings.osr_t = BME280_OVERSAMPLING_2X;
+//     dev->settings.filter = BME280_FILTER_COEFF_16;
+
+//     settings_sel = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
+
+//     /* Set the sensor settings */
+//     rslt = bme280_set_sensor_settings(settings_sel, dev);
+//     if (rslt != BME280_OK)
+//     {
+//         fprintf(stderr, "Failed to set sensor settings (code %+d).", rslt);
+
+//         return rslt;
+//     }
+
+//     printf("Temperature, Pressure, Humidity\n");
+
+//     /*Calculate the minimum delay required between consecutive measurement based upon the sensor enabled
+//      *  and the oversampling configuration. */
+//     req_delay = bme280_cal_meas_delay(&dev->settings);
+
+//     /* Continuously stream sensor data */
+//     // while (1)
+//     // {
+//     /* Set the sensor to forced mode */
+//     rslt = bme280_set_sensor_mode(BME280_FORCED_MODE, dev);
+//     if (rslt != BME280_OK)
+//     {
+//         fprintf(stderr, "Failed to set sensor mode (code %+d).", rslt);
+//         // break;
+//     }
+
+//     /* Wait for the measurement to complete and print data */
+//     dev->delay_us(req_delay, dev->intf_ptr);
+//     rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
+//     if (rslt != BME280_OK)
+//     {
+//         fprintf(stderr, "Failed to get sensor data (code %+d).", rslt);
+//         // break;
+//     }
+
+//     print_sensor_data(&comp_data);
+//     // }
+
+//     return rslt;
+// }
+
+
+//
+// BME280 temperature/pressure/humidity sensor
+// prototyping code to read and calculate calibrated values
+// from the I2C bus
+//
+// Written by Larry Bank - 2/1/2017
+// Copyright (c) 2017 BitBank Software, Inc.
+// bitbank@pobox.com
+//
 #include <unistd.h>
-#include <sys/types.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
 
-/******************************************************************************/
-/*!                         Own header files                                  */
-#include "bme280.h"
+static int file_i2c = 0;
+// Sensor calibration data
+static int calT1,calT2,calT3;
+static int calP1, calP2, calP3, calP4, calP5, calP6, calP7, calP8, calP9;
+static int calH1, calH2, calH3, calH4, calH5, calH6;
 
-/******************************************************************************/
-/*!                               Structures                                  */
-
-/* Structure that contains identifier details used in example */
-struct identifier
+//
+// Opens a file system handle to the I2C device
+// reads the calibration data and sets the device
+// into auto sensing mode
+//
+int bme280Init(int iChannel, int iAddr)
 {
-    /* Variable to hold device address */
-    uint8_t dev_addr;
+int i, rc;
+unsigned char ucTemp[32];
+unsigned char ucCal[36];
+char filename[32];
+ 
+	sprintf(filename, "/dev/i2c-%d", iChannel);
+	if ((file_i2c = open(filename, O_RDWR)) < 0)
+	{
+		fprintf(stderr, "Failed to open the i2c bus\n");
+		file_i2c = 0;
+		return -1;
+	}
 
-    /* Variable that contains file descriptor */
-    int8_t fd;
-};
+	if (ioctl(file_i2c, I2C_SLAVE, iAddr) < 0)
+	{
+		fprintf(stderr, "Failed to acquire bus access or talk to slave\n");
+		file_i2c = 0;
+		return -1;
+	}
 
-/****************************************************************************/
-/*!                         Functions                                       */
+	ucTemp[0] = 0xd0; // get ID
+	rc = write(file_i2c, ucTemp, 1);
+	i = read(file_i2c, ucTemp, 1);
+	if (rc < 0 || i != 1 || ucTemp[0] != 0x60)
+	{
+		printf("Error, ID doesn't match 0x60; wrong device?\n");
+		return -1;
+	}
+	// Read 24 bytes of calibration data
+	ucTemp[0] = 0x88; // starting 4from register 0x88
+	rc = write(file_i2c, ucTemp, 1);
+	i = read(file_i2c, ucCal, 24);
+	if (rc < 0 || i != 24)
+	{
+		printf("calibration data not read correctly\n");
+		return -1;
+	}
+	ucTemp[0] = 0xa1; // get humidity calibration byte
+	rc = write(file_i2c, ucTemp, 1);
+	i = read(file_i2c, &ucCal[24], 1);
+	ucTemp[0] = 0xe1; // get 7 more humidity calibration bytes
+	rc = write(file_i2c, ucTemp, 1);
+	i = read(file_i2c, &ucCal[25], 7);
+	if (rc < 0 || i < 0) // something went wrong
+	{}
+	// Prepare temperature calibration data
+	calT1 = ucCal[0] + (ucCal[1] << 8);
+	calT2 = ucCal[2] + (ucCal[3] << 8);
+	if (calT2 > 32767) calT2 -= 65536; // negative value
+	calT3 = ucCal[4] + (ucCal[5] << 8);
+	if (calT3 > 32767) calT3 -= 65536;
+	
+	// Prepare pressure calibration data
+	calP1 = ucCal[6] + (ucCal[7] << 8);
+	calP2 = ucCal[8] + (ucCal[9] << 8);
+	if (calP2 > 32767) calP2 -= 65536; // signed short
+	calP3 = ucCal[10] + (ucCal[11] << 8);
+	if (calP3 > 32767) calP3 -= 65536;
+	calP4 = ucCal[12] + (ucCal[13] << 8);
+	if (calP4 > 32767) calP4 -= 65536;
+	calP5 = ucCal[14] + (ucCal[15] << 8);
+	if (calP5 > 32767) calP5 -= 65536;
+	calP6 = ucCal[16] + (ucCal[17] << 8);
+	if (calP6 > 32767) calP6 -= 65536;
+	calP7 = ucCal[18] + (ucCal[19] << 8);
+	if (calP7 > 32767) calP7 -= 65536;
+	calP8 = ucCal[20] + (ucCal[21] << 8);
+	if (calP8 > 32767) calP8 -= 65536;
+	calP9 = ucCal[22] + (ucCal[23] << 8);
+	if (calP9 > 32767) calP9 -= 65536;
 
-/*!
- *  @brief Function that creates a mandatory delay required in some of the APIs.
- *
- * @param[in] period              : Delay in microseconds.
- * @param[in, out] intf_ptr       : Void pointer that can enable the linking of descriptors
- *                                  for interface related call backs
- *  @return void.
- *
- */
-void user_delay_us(uint32_t period, void *intf_ptr);
+	// Prepare humidity calibration data
+	calH1 = ucCal[24];
+	calH2 = ucCal[25] + (ucCal[26] << 8);
+	if (calH2 > 32767) calH2 -= 65536;
+	calH3 = ucCal[27];
+	calH4 = (ucCal[28] << 4) + (ucCal[29] & 0xf);
+	if (calH4 > 2047) calH4 -= 4096; // signed 12-bit
+	calH5 = (ucCal[30] << 4) + (ucCal[29] >> 4);
+	if (calH5 > 2047) calH5 -= 4096;
+	calH6 = ucCal[31];
+	if (calH6 > 127) calH6 -= 256; // signed char
 
-/*!
- * @brief Function for print the temperature, humidity and pressure data.
- *
- * @param[out] comp_data    :   Structure instance of bme280_data
- *
- * @note Sensor data whose can be read
- *
- * sens_list
- * --------------
- * Pressure
- * Temperature
- * Humidity
- *
- */
-void print_sensor_data(struct bme280_data *comp_data);
+	ucTemp[0] = 0xf2; // control humidity register
+	ucTemp[1] = 0x01; // humidity over sampling rate = 1
+	rc = write(file_i2c, ucTemp, 2);
 
-/*!
- *  @brief Function for reading the sensor's registers through I2C bus.
- *
- *  @param[in] reg_addr       : Register address.
- *  @param[out] data          : Pointer to the data buffer to store the read data.
- *  @param[in] len            : No of bytes to read.
- *  @param[in, out] intf_ptr  : Void pointer that can enable the linking of descriptors
- *                                  for interface related call backs.
- *
- *  @return Status of execution
- *
- *  @retval 0 -> Success
- *  @retval > 0 -> Failure Info
- *
- */
-int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr);
+	ucTemp[0] = 0xf4; // control measurement register
+	ucTemp[1] = 0x27; // normal mode, temp and pressure over sampling rate=1
+	rc = write(file_i2c, ucTemp, 2);
 
-/*!
- *  @brief Function for writing the sensor's registers through I2C bus.
- *
- *  @param[in] reg_addr       : Register address.
- *  @param[in] data           : Pointer to the data buffer whose value is to be written.
- *  @param[in] len            : No of bytes to write.
- *  @param[in, out] intf_ptr  : Void pointer that can enable the linking of descriptors
- *                                  for interface related call backs
- *
- *  @return Status of execution
- *
- *  @retval BME280_OK -> Success
- *  @retval BME280_E_COMM_FAIL -> Communication failure.
- *
- */
-int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr);
+	ucTemp[0] = 0xf5; // CONFIG
+	ucTemp[1] = 0xa0; // set stand by time to 1 second
+	rc = write(file_i2c, ucTemp, 2);
+	if (rc < 0) {} // suppress warning
 
-/*!
- * @brief Function reads temperature, humidity and pressure data in forced mode.
- *
- * @param[in] dev   :   Structure instance of bme280_dev.
- *
- * @return Result of API execution status
- *
- * @retval BME280_OK - Success.
- * @retval BME280_E_NULL_PTR - Error: Null pointer error
- * @retval BME280_E_COMM_FAIL - Error: Communication fail error
- * @retval BME280_E_NVM_COPY_FAILED - Error: NVM copy failed
- *
- */
-int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev);
+	return 0;
 
-/*!
- * @brief This function starts execution of the program.
- */
-void read_from_bme() {
-    struct bme280_dev dev;
+} /* bme280Init() */
 
-    struct identifier id;
-
-    /* Variable to define the result */
-    int8_t rslt = BME280_OK;
-
-    if ((id.fd = open("/dev/i2c-1", O_RDWR)) < 0)
-    {
-        fprintf(stderr, "Failed to open the i2c bus\n");
-        exit(1);
-    }
-
-    /* Make sure to select BME280_I2C_ADDR_PRIM or BME280_I2C_ADDR_SEC as needed */
-    /* ME280_I2C_ADDR_PRIM: 0x76 */
-    id.dev_addr = BME280_I2C_ADDR_PRIM;
-
-    dev.intf = BME280_I2C_INTF;
-    dev.read = user_i2c_read;
-    dev.write = user_i2c_write;
-    dev.delay_us = user_delay_us;
-
-    /* Update interface pointer with the structure that contains both device address and file descriptor */
-    dev.intf_ptr = &id;
-
-    if (ioctl(id.fd, I2C_SLAVE, id.dev_addr) < 0)
-    {
-        fprintf(stderr, "Failed to acquire bus access and/or talk to slave.\n");
-        exit(1);
-    }
-
-    /* Initialize the bme280 */
-    rslt = bme280_init(&dev);
-    if (rslt != BME280_OK)
-    {
-        fprintf(stderr, "Failed to initialize the device (code %+d).\n", rslt);
-        exit(1);
-    }
-
-    rslt = stream_sensor_data_forced_mode(&dev);
-    if (rslt != BME280_OK)
-    {
-        fprintf(stderr, "Failed to stream sensor data (code %+d).\n", rslt);
-        exit(1);
-    }
-}
-
-/*!
- * @brief This function reading the sensor's registers through I2C bus.
- */
-int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr)
+//
+// Read the sensor register values
+// and translate them into calibrated readings
+// using the previously loaded calibration data
+// Temperature is expressed in Celsius degrees as T * 100 (for 2 decimal places)
+// Pressure is <future>
+// Humidity is express as H * 1024 (10 bit fraction)
+//
+int bme280ReadValues(int *T, int *P, int *H)
 {
-    struct identifier id;
+unsigned char ucTemp[16];
+int i,rc;
+int t, p, h; // raw sensor values
+int var1,var2,t_fine;
+int64_t P_64;
+int64_t var1_64, var2_64;
 
-    id = *((struct identifier *)intf_ptr);
+	ucTemp[0] = 0xf7; // start of data registers we want
+	rc = write(file_i2c, ucTemp, 1); // write address of register to read
+	i = read(file_i2c, ucTemp, 8);
+	if (rc < 0 || i != 8)
+	{
+		return -1; // something went wrong
+	}
+	p = (ucTemp[0] << 12) + (ucTemp[1] << 4) + (ucTemp[2] >> 4);
+	t = (ucTemp[3] << 12) + (ucTemp[4] << 4) + (ucTemp[5] >> 4);
+	h = (ucTemp[6] << 8) + ucTemp[7];
+//	printf("raw values: p = %d, t = %d, h = %d\n", p, t, h);
+	// Calculate calibrated temperature value
+	// the value is 100x C (e.g. 2601 = 26.01C)
+	var1 = ((((t >> 3) - (calT1 <<1))) * (calT2)) >> 11;
+	var2 = (((((t >> 4) - (calT1)) * ((t>>4) - (calT1))) >> 12) * (calT3)) >> 14;
+	t_fine = var1 + var2;
+	*T = (t_fine * 5 + 128) >> 8;
 
-    write(id.fd, &reg_addr, 1);
-    read(id.fd, data, len);
+	// Calculate calibrated pressure value
+	var1_64 = t_fine - 128000;
+	var2_64 = var1_64 * var1_64 * (int64_t)calP6;
+	var2_64 = var2_64 + ((var1_64 * (int64_t)calP5) << 17);
+	var2_64 = var2_64 + (((int64_t)calP4) << 35);
+	var1_64 = ((var1_64 * var1_64 * (int64_t)calP3)>>8) + ((var1_64 * (int64_t)calP2)<<12);
+	var1_64 = (((((int64_t)1)<<47)+var1_64))*((int64_t)calP1)>>33;
+	if (var1_64 == 0)
+	{
+		*P = 0;
+	}
+	else
+	{
+		P_64 = 1048576 - p;
+		P_64 = (((P_64<<31)-var2_64)*3125)/var1_64;
+		var1_64 = (((int64_t)calP9) * (P_64>>13) * (P_64>>13)) >> 25;
+		var2_64 = (((int64_t)calP8) * P_64) >> 19;
+		P_64 = ((P_64 + var1_64 + var2_64) >> 8) + (((int64_t)calP7)<<4);
+		*P = (int)P_64 / 100;
+	}
+	// Calculate calibrated humidity value
+	var1 = (t_fine - 76800);
+	var1 = (((((h << 14) - ((calH4) << 20) - ((calH5) * var1)) + 
+		(16384)) >> 15) * (((((((var1 * (calH6)) >> 10) * (((var1 * (calH3)) >> 11) + (32768))) >> 10) + (2097152)) * (calH2) + 8192) >> 14));
+	var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7) * (calH1)) >> 4));
+	var1 = (var1 < 0? 0 : var1);
+	var1 = (var1 > 419430400 ? 419430400 : var1);
+	*H = var1 >> 12;
+	return 0;
 
-    return 0;
-}
-
-/*!
- * @brief This function provides the delay for required time (Microseconds) as per the input provided in some of the
- * APIs
- */
-void user_delay_us(uint32_t period, void *intf_ptr)
-{
-    usleep(period);
-}
-
-/*!
- * @brief This function for writing the sensor's registers through I2C bus.
- */
-int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
-{
-    uint8_t *buf;
-    struct identifier id;
-
-    id = *((struct identifier *)intf_ptr);
-
-    buf = malloc(len + 1);
-    buf[0] = reg_addr;
-    memcpy(buf + 1, data, len);
-    if (write(id.fd, buf, len + 1) < (uint16_t)len)
-    {
-        return BME280_E_COMM_FAIL;
-    }
-
-    free(buf);
-
-    return BME280_OK;
-}
-
-/*!
- * @brief This API used to print the sensor temperature, pressure and humidity data.
- */
-void print_sensor_data(struct bme280_data *comp_data)
-{
-    float temp, press, hum;
-
-#ifdef BME280_FLOAT_ENABLE
-    temp = comp_data->temperature;
-    press = 0.01 * comp_data->pressure;
-    hum = comp_data->humidity;
-#else
-#ifdef BME280_64BIT_ENABLE
-    temp = 0.01f * comp_data->temperature;
-    press = 0.0001f * comp_data->pressure;
-    hum = 1.0f / 1024.0f * comp_data->humidity;
-#else
-    temp = 0.01f * comp_data->temperature;
-    press = 0.01f * comp_data->pressure;
-    hum = 1.0f / 1024.0f * comp_data->humidity;
-#endif
-#endif
-    printf("%0.2lf deg C, %0.2lf hPa, %0.2lf%%\n", temp, press, hum);
-}
-
-/*!
- * @brief This API reads the sensor temperature, pressure and humidity data in forced mode.
- */
-int8_t stream_sensor_data_forced_mode(struct bme280_dev *dev)
-{
-    /* Variable to define the result */
-    int8_t rslt = BME280_OK;
-
-    /* Variable to define the selecting sensors */
-    uint8_t settings_sel = 0;
-
-    /* Variable to store minimum wait time between consecutive measurement in force mode */
-    uint32_t req_delay;
-
-    /* Structure to get the pressure, temperature and humidity values */
-    struct bme280_data comp_data;
-
-    /* Recommended mode of operation: Indoor navigation */
-    dev->settings.osr_h = BME280_OVERSAMPLING_1X;
-    dev->settings.osr_p = BME280_OVERSAMPLING_16X;
-    dev->settings.osr_t = BME280_OVERSAMPLING_2X;
-    dev->settings.filter = BME280_FILTER_COEFF_16;
-
-    settings_sel = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
-
-    /* Set the sensor settings */
-    rslt = bme280_set_sensor_settings(settings_sel, dev);
-    if (rslt != BME280_OK)
-    {
-        fprintf(stderr, "Failed to set sensor settings (code %+d).", rslt);
-
-        return rslt;
-    }
-
-    printf("Temperature, Pressure, Humidity\n");
-
-    /*Calculate the minimum delay required between consecutive measurement based upon the sensor enabled
-     *  and the oversampling configuration. */
-    req_delay = bme280_cal_meas_delay(&dev->settings);
-
-    /* Continuously stream sensor data */
-    // while (1)
-    // {
-    /* Set the sensor to forced mode */
-    rslt = bme280_set_sensor_mode(BME280_FORCED_MODE, dev);
-    if (rslt != BME280_OK)
-    {
-        fprintf(stderr, "Failed to set sensor mode (code %+d).", rslt);
-        // break;
-    }
-
-    /* Wait for the measurement to complete and print data */
-    dev->delay_us(req_delay, dev->intf_ptr);
-    rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
-    if (rslt != BME280_OK)
-    {
-        fprintf(stderr, "Failed to get sensor data (code %+d).", rslt);
-        // break;
-    }
-
-    print_sensor_data(&comp_data);
-    // }
-
-    return rslt;
-}
+} /* bme280ReadValues() */
