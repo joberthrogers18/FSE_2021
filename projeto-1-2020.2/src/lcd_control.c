@@ -68,9 +68,9 @@ void typeln(const char *s)   {
 }
 
 // float to string
-void typeDouble(double currentDouble)   {
+void typeFloat(float currentDouble)   {
   char buffer[20];
-  sprintf(buffer, "%4.2lf",  currentDouble);
+  sprintf(buffer, "%.1f",  currentDouble);
   typeln(buffer);
 }
 
@@ -113,15 +113,15 @@ void lcd_init()   {
     delayMicroseconds(500);
 }
 
-void printInScreen(const char *line1Print, const char *line2Print) {
+void printInScreen(float *TE, float *TI, float *TR) {
     ClrLcd(); // clear display
 
     lcdLoc(LINE1);
     typeln("TE: ");
-    typeDouble(2.7);
+    typeFloat(*TE);
     typeln("TI: ");
-    typeDouble(2.7);
+    typeFloat(*TI);
     lcdLoc(LINE2);
     typeln("TR: ");
-    typeDouble(2.7);
+    typeFloat(*TR);
 }
