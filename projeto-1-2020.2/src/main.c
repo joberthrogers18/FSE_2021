@@ -6,23 +6,34 @@
 
 int main(int argc, char const *argv[])
 {
-    // lcd_init();
-
-    // read_from_bme();
+    initUART();
 
     lcd_init();
 
-    float internalTemperature, referenceTemperature;
+    int i = bme280Init(1, 0x76);
+	if (i != 0)
+	{
+		printf("Erro to open\n"); // problem - quit
+	}
 
-    getInformationModbus(&internalTemperature, &referenceTemperature);
+    while (1)
+    {    
+        float internalTemperature, referenceTemperature;
 
-    int temperatureExternal;
+        getInformationModbus(&internalTemperature, &referenceTemperature);
 
-    getInformationBME280(&temperatureExternal);
+        int temperatureExternal;
 
-    float temperatureExt = (float)temperatureExternal/100;
+        getInformationBME280(&temperatureExternal);
 
-    printInScreen(&temperatureExt, &internalTemperature, &referenceTemperature);
+        float temperatureExt = (float)temperatureExternal/100;
+
+        printInScreen(&temperatureExt, &internalTemperature, &referenceTemperature);
+
+        usleep(1000);
+    }
+
+    closeUART();
 
     return 0;
 }

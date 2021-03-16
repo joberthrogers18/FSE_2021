@@ -196,16 +196,8 @@ int64_t var1_64, var2_64;
 
 
 void getInformationBME280(int *temperature) {
-	int i;
     int pressure, humidity; // calibrated values
 
-	i = bme280Init(1, 0x76);
-	if (i != 0)
-	{
-		printf("Erro to open\n"); // problem - quit
-	}
-
-	printf("BME280 device successfully opened.\n");
-
     bme280ReadValues(temperature, &pressure, &humidity);
+	usleep(250);
 }
