@@ -7,24 +7,18 @@
 #define MAX_RANGE_PWM 100
 
 void controlFanResistorPWM(int control_signal) {
-    // update the GPIO entries
     if (control_signal > 0) {
-        // TODO: on the resistor  acionar_resistor((int) saida_controle);
-        //       off the fan      desligar_ventoinha();
         turnONResistor((int) control_signal);
         turnOFFFAN();
     }
     else {
         if (control_signal < -20.0) {
-            // acionar_ventoinha((int) (-1.0 * saida_controle))
             turnONResistor((int) (-1.0 * control_signal));
         }
         else {
-            // desligar_ventoinha();
             turnOFFFAN();
         }
 
-        // desligar_resistor();
         turnOFFResistor();
     }
 }
