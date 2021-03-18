@@ -199,5 +199,5 @@ void getInformationBME280(int *temperature) {
     int pressure, humidity; // calibrated values
 
     bme280ReadValues(temperature, &pressure, &humidity);
-	usleep(250);
+	usleep(1200);
 }

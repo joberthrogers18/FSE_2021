@@ -4,6 +4,7 @@
         "*.js": "javascriptreact",
         "lcd_control.h": "c",
         "read_bme280.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "gpio.h": "c"
     }
 }

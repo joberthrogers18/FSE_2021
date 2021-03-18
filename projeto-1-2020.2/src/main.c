@@ -6,31 +6,44 @@
 #include <wiringPi.h> /* include wiringPi library */
 #include <stdio.h>
 #include <gpio.h>
+#include <pid.h>
+
+#define KP 5.0
+#define KI 1.0
+#define KD 5.0 
+#define ADDRESS_BME280 0x76
+#define CHANNEL_BME280 1
 
 int main(int argc, char const *argv[])
 {
     double control_signal = 0.0;
+    float internalTemperature = 0.0;
+    float referenceTemperature = 0.0;
+    int temperatureExternal = 0.0;
+
     initUART();
 
     lcd_init();
 
-    int i = bme280Init(1, 0x76);
+    int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	if (i != 0)
 	{
 		printf("Erro to open\n"); // problem - quit
 	}
 
-    pid_configura_constantes(10.0, 1.0, 5.0);
+    // before: 10, 1, 5
+    pid_configura_constantes(KP, KI, KD);
 
     wiringPiSetup();
 
-    while (1)
-    {    
-        float internalTemperature, referenceTemperature;
+    turnOFFFAN();
+    turnOFFResistor();
+
+    for (int i = 0; i < 200; i ++)
+    {  
+        sleep(1);  
 
         getInformationModbus(&internalTemperature, &referenceTemperature);
-
-        int temperatureExternal;
 
         getInformationBME280(&temperatureExternal);
 
@@ -38,55 +51,16 @@ int main(int argc, char const *argv[])
 
         printInScreen(&temperatureExt, &internalTemperature, &referenceTemperature);
 
-        usleep(1000);
-
-        pid_atualiza_referencia(referenceTemperature)
+        pid_atualiza_referencia(referenceTemperature);
 
         control_signal = pid_controle(internalTemperature);
 
-        controlFanResistorPWM(control_signal);
+        controlFanResistorPWM((int) control_signal);
     }
 
+    turnOFFFAN();
+    turnOFFResistor();
     closeUART();
 
     return 0;
 }
-
-
-// #include <wiringPi.h> /* include wiringPi library */
-// #include <stdio.h>    
-// #include <softPwm.h>  /* include header file for software PWM */
-// #include <pid.h>
-
-// int main(){
-	// int PWM_pin_RESISTO = 4;		/* GPIO1 as per WiringPi,GPIO18 as per BCM */
-    // int PWM_pin_FAN = 5;		/* GPIO1 as per WiringPi,GPIO18 as per BCM */
-	// int intensity;
-	// wiringPiSetup();		/* initialize wiringPi setup */
-	// pinMode(PWM_pin_RESISTO,OUTPUT);	/* set GPIO as output */
-	// softPwmCreate(PWM_pin_RESISTO,1,100);	/* set PWM channel along with range*/
-	
-    // digitalWrite (PWM_pin_RESISTO,  LOW) ; delay (1500) ;
-    // digitalWrite (PWM_pin_RESISTO, HIGH) ; delay (1500) ;
-    // digitalWrite (PWM_pin_RESISTO,  LOW) ; delay (1500) ;
-    // while (1)
-	//   {
-	// 	for (intensity = 0; intensity < 101; intensity++)
-	// 	{
-	// 	  softPwmWrite (PWM_pin, intensity); /* change the value of PWM */
-	// 	  delay (10) ;
-	// 	}
-	// 	delay(1);
-
-	// 	for (intensity = 100; intensity >= 0; intensity--)
-	// 	{
-	// 	  softPwmWrite (PWM_pin, intensity);
-	// 	  delay (10);
-	// 	}
-	// 	delay(1);
-		
-	// }
-
-//     pid_configura_constantes(10.0, 1.0, 5.0);
-    
-// }

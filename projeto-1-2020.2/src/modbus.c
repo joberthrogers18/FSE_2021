@@ -11,6 +11,7 @@
 #define SUB_CODE_TI 0XC1
 #define SUB_CODE_TR 0xC2
 
+#define TIMEOUT_MODBUS 100000
 
 int uart0_filestream = -1;
 
@@ -82,7 +83,6 @@ int requestFloat(char subCode) {
 }
 
 void getMessageModbus(float *temperature, char subCode) {
-    usleep(500);
     if (uart0_filestream != -1) {
         // buffer to read
         unsigned char rx_buffer[256];
@@ -93,17 +93,17 @@ void getMessageModbus(float *temperature, char subCode) {
 
         if (rx_length < 0)
         {
-            printf("Error during read of UART - RX\n");
-            requestFloat(subCode);
-            usleep(500);
-            getMessageModbus(temperature, subCode);
+            printf("Error during read of UART - RX %c\n", subCode);
+            // requestFloat(subCode);
+            // usleep(1200);
+            // getMessageModbus(temperature, subCode);
         }
         else if (rx_length == 0)
         {
             printf("There is no content available\n");
-            requestFloat(subCode);
-            usleep(500);
-            getMessageModbus(temperature, subCode);
+            // requestFloat(subCode);
+            // usleep(700);
+            // getMessageModbus(temperature, subCode);
         }
         else
         {
@@ -121,11 +121,11 @@ void closeUART() {
 }
 
 void getInformationModbus(float *TI, float *TR) {
-    printf("Temperatura Externa");
     requestFloat(SUB_CODE_TI);
+    usleep(TIMEOUT_MODBUS);
     getMessageModbus(TI, SUB_CODE_TI);
 
-    printf("Temperatura Potenciometro");
     requestFloat(SUB_CODE_TR);
+    usleep(TIMEOUT_MODBUS);
     getMessageModbus(TR, SUB_CODE_TR);
 }
