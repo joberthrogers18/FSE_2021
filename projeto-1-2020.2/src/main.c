@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <gpio.h>
 #include <pid.h>
+#include <utils.h>
 
 #define KP 5.0
 #define KI 1.0
@@ -24,6 +25,8 @@ int main(int argc, char const *argv[])
     initUART();
 
     lcd_init();
+
+    csvCreation();
 
     int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	if (i != 0)
@@ -55,7 +58,10 @@ int main(int argc, char const *argv[])
 
         control_signal = pid_controle(internalTemperature);
 
+        printLog(float TI, float TE, float TR, double controlSignal);
+
         controlFanResistorPWM((int) control_signal);
+
     }
 
     turnOFFFAN();
