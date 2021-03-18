@@ -117,11 +117,12 @@ void printInScreen(float *TE, float *TI, float *TR) {
     ClrLcd(); // clear display
 
     lcdLoc(LINE1);
-    typeln("TE: ");
+    typeln("TE:");
     typeFloat(*TE);
-    typeln("TI: ");
+    typeln(" ");
+    typeln("TI:");
     typeFloat(*TI);
     lcdLoc(LINE2);
-    typeln("TR: ");
+    typeln("TR:");
     typeFloat(*TR);
 }
