@@ -120,12 +120,14 @@ void closeUART() {
     close(uart0_filestream);
 }
 
-void getInformationModbus(float *TI, float *TR) {
+void getInformationModbus(float *TI, float *TR, int referenceManual) {
     requestFloat(SUB_CODE_TI);
     usleep(TIMEOUT_MODBUS);
     getMessageModbus(TI, SUB_CODE_TI);
 
-    requestFloat(SUB_CODE_TR);
-    usleep(TIMEOUT_MODBUS);
-    getMessageModbus(TR, SUB_CODE_TR);
+    if (referenceManual != 1) {
+        requestFloat(SUB_CODE_TR);
+        usleep(TIMEOUT_MODBUS);
+        getMessageModbus(TR, SUB_CODE_TR);
+    }
 }

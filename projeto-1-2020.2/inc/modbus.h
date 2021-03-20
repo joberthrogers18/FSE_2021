@@ -2,7 +2,7 @@
 #define MODBUS_H_
 
 void initUART();
-void getInformationModbus(float *TE, float *TR);
+void getInformationModbus(float *TI, float *TR, int referenceManual);
 void closeUART();
 
 #endif

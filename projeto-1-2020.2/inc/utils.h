@@ -3,5 +3,6 @@
 
 void csvCreation();
 void printLog(float TI, float TE, float TR, double controlSignal);
+void printMenu();
 
 #endif

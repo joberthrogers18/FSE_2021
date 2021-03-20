@@ -1,6 +1,7 @@
 #include <stdio.h> 
 #include <time.h>  
 #include <utils.h>
+#include <stdlib.h>
 
 void csvCreation() {
     FILE* csvFile;
@@ -32,4 +33,13 @@ void printLog(float TI, float TE, float TR, double controlSignal) {
     printf("\n\n========== VALORES COLETADOS ==========\n");
     printf("TI: %f TE: %f TR: %f\n", TI, TE, TR);
     addInfoFileCsv(TI, TE, TR, controlSignal);
+}
+
+void printMenu() {
+    system("clear");
+    printf("======== Projeto 1 FSE ========\n");
+    printf("\nEscolha uma das opções abaixo:\n\n");
+    printf("1) Executar experimento usando a temperatura do potenciometro\n");
+    printf("2) Entrar com um temperatura de referência\n");
+    printf("3) Sair do programa\n");
 }
