@@ -38,7 +38,7 @@ void initResources() {
 	}
 
     // before: 10, 1, 5
-    pid_configura_constantes(KP, KI, KD);
+    pid_configure_consts(KP, KI, KD);
     wiringPiSetup();
     turnOFFFAN();
     turnOFFResistor();
@@ -127,9 +127,9 @@ int main(int argc, char const *argv[])
 
         printInScreen(&temperatureExt, &internalTemperature, &referenceTemperature);
 
-        pid_atualiza_referencia(referenceTemperature);
+        pid_update_reference(referenceTemperature);
 
-        controlSignal = pid_controle(internalTemperature);
+        controlSignal = pid_control(internalTemperature);
 
         printLog(
             internalTemperature, 

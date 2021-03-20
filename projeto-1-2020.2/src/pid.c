@@ -1,56 +1,62 @@
+/*
+ * pid.c
+ *
+ * Author: Renato Coral Sampaio
+ */
+
 #include "pid.h"
 #include <stdio.h>
 
-double saida_medida, sinal_de_controle;
-double referencia = 0.0;
-double Kp = 0.0;  // Ganho Proporcional
-double Ki = 0.0;  // Ganho Integral
-double Kd = 0.0;  // Ganho Derivativo
-int T = 1.0;      // Período de Amostragem (ms)
+double measure_out, control_signal;
+double reference = 0.0;
+double Kp = 0.0;  // Proportional Gain
+double Ki = 0.0;  // Integral Gain
+double Kd = 0.0;  // Derivated Gain
+int T = 1.0;      // Sample Period (ms)
 unsigned long last_time;
-double erro_total, erro_anterior = 0.0;
-int sinal_de_controle_MAX = 100.0;
-int sinal_de_controle_MIN = -100.0;
+double total_error, erro_anterior = 0.0;
+int control_signal_MAX = 100.0;
+int control_signal_MIN = -100.0;
 
-void pid_configura_constantes(double Kp_, double Ki_, double Kd_){
+void pid_configure_consts(double Kp_, double Ki_, double Kd_){
     Kp = Kp_;
     Ki = Ki_;
     Kd = Kd_;
 }
 
-void pid_atualiza_referencia(float referencia_){
-    referencia = (double) referencia_;
+void pid_update_reference(float reference_){
+    reference = (double) reference_;
 }
 
-double pid_controle(double saida_medida){
+double pid_control(double measure_out){
 
-    double erro = referencia - saida_medida;
+    double erro = reference - measure_out;
 
-    erro_total += erro; // Acumula o erro (Termo Integral)
+    total_error += erro; // Accumulate o erro (Integral Term)
 
-    if (erro_total >= sinal_de_controle_MAX) 
+    if (total_error >= control_signal_MAX) 
     {
-        erro_total = sinal_de_controle_MAX;
+        total_error = control_signal_MAX;
     }
-    else if (erro_total <= sinal_de_controle_MIN) 
+    else if (total_error <= control_signal_MIN) 
     {
-        erro_total = sinal_de_controle_MIN;
+        total_error = control_signal_MIN;
     }
 
-    double delta_error = erro - erro_anterior; // Diferença entre os erros (Termo Derivativo)
+    double delta_error = erro - erro_anterior; // Difference between error (Derivated Term)
 
-    sinal_de_controle = Kp*erro + (Ki*T)*erro_total + (Kd/T)*delta_error; // PID calcula sinal de controle
+    control_signal = Kp*erro + (Ki*T)*total_error + (Kd/T)*delta_error; // PID calculate singal de control
 
-    if (sinal_de_controle >= sinal_de_controle_MAX) 
+    if (control_signal >= control_signal_MAX) 
     {
-        sinal_de_controle = sinal_de_controle_MAX;
+        control_signal = control_signal_MAX;
     }
-    else if (sinal_de_controle <= sinal_de_controle_MIN) 
+    else if (control_signal <= control_signal_MIN) 
     {
-        sinal_de_controle = sinal_de_controle_MIN;
+        control_signal = control_signal_MIN;
     }
 
     erro_anterior = erro;
 
-    return sinal_de_controle;
+    return control_signal;
 }
