@@ -9,6 +9,7 @@
 #include <pid.h>
 #include <utils.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #define KP 5.0
 #define KI 1.0
@@ -17,9 +18,13 @@
 #define CHANNEL_BME280 1
 
 int useRefManual = 0;
+double controlSignal = 0.0;
+float internalTemperature = 0.0;
+float referenceTemperature = 0.0;
+int temperatureExternal = 0.0;
 
 void getManualReference(float *internalTemp, float *referenceTemp);
-void menuhandler(float *internalTemp, float *referenceTemp);
+void menuhandler();
 
 void initResources() {
     initUART();
@@ -51,19 +56,26 @@ void getManualReference(float *internalTemp, float *referenceTemp) {
 
     getInformationModbus(internalTemp, referenceTemp, useRefManual);
 
+    getInformationBME280(&temperatureExternal);
+
+    float temperatureExt = (float)temperatureExternal/100;
+
     system("clear");
     printf("Digite a temperatura de referência desejada:\n");
     scanf("%f", &RefTemp);
     
-    if (RefTemp < *internalTemp) {
+    if (RefTemp < temperatureExt || RefTemp > 100) {
+        system("clear");
+        printf("A temperatura não pode ser menor que %.2f Cº e maior que 100 Cº\n", temperatureExt);
+        sleep(2);
         menuhandler(internalTemp, referenceTemp);
+    } else {
+        *referenceTemp = RefTemp;
+        useRefManual = 1;
     }
-
-    *referenceTemp = RefTemp;
-    useRefManual = 1;
 }
 
-void menuhandler(float *internalTemp, float *referenceTemp) {
+void menuhandler() {
     char option;
     printMenu();
     
@@ -72,14 +84,18 @@ void menuhandler(float *internalTemp, float *referenceTemp) {
     switch (option)
     {
         case '1':
+            turnOFFFAN();
+            turnOFFResistor();
             useRefManual = 0;
             break;
 
         case '2':
-            getManualReference(internalTemp, referenceTemp);
+            turnOFFFAN();
+            turnOFFResistor();
+            getManualReference(&internalTemperature, &referenceTemperature);
             break;
 
-        case '0':
+        case '3':
             finishResources();
             break;
         
@@ -87,26 +103,22 @@ void menuhandler(float *internalTemp, float *referenceTemp) {
             system("clear");
             printf("Opção errada, escolha novamente\n");
             sleep(1);
-            menuhandler(internalTemp, referenceTemp);
+            menuhandler();
             break;
     }
 }
 
 int main(int argc, char const *argv[])
 {
-    double controlSignal = 0.0;
-    float internalTemperature = 0.0;
-    float referenceTemperature = 0.0;
-    int temperatureExternal = 0.0;
+    signal(SIGINT, menuhandler);
 
     initResources();
 
-    menuhandler(&internalTemperature, &referenceTemperature);
+    menuhandler();
 
     while (1)
     {  
         sleep(1);  
-
         getInformationModbus(&internalTemperature, &referenceTemperature, useRefManual);
 
         getInformationBME280(&temperatureExternal);

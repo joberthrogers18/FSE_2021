@@ -32,7 +32,7 @@ void addInfoFileCsv(float TI, float TE, float TR, double controlSignal) {
 void printLog(float TI, float TE, float TR, double controlSignal) {
     printf("\n\n========== VALORES COLETADOS ==========\n");
     printf("TI: %f TE: %f TR: %f\n", TI, TE, TR);
-    addInfoFileCsv(TI, TE, TR, controlSignal);
+    // addInfoFileCsv(TI, TE, TR, controlSignal);
 }
 
 void printMenu() {
