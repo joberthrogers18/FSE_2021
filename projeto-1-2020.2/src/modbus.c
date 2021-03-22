@@ -94,16 +94,16 @@ void getMessageModbus(float *temperature, char subCode) {
         if (rx_length < 0)
         {
             printf("Error during read of UART - RX %c\n", subCode);
-            // requestFloat(subCode);
-            // usleep(1200);
-            // getMessageModbus(temperature, subCode);
+            requestFloat(subCode);
+            usleep(TIMEOUT_MODBUS);
+            getMessageModbus(temperature, subCode);
         }
         else if (rx_length == 0)
         {
             printf("There is no content available\n");
-            // requestFloat(subCode);
-            // usleep(700);
-            // getMessageModbus(temperature, subCode);
+            requestFloat(subCode);
+            usleep(TIMEOUT_MODBUS);
+            getMessageModbus(temperature, subCode);
         }
         else
         {
