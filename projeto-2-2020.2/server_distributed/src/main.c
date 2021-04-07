@@ -21,8 +21,8 @@ int main(int argc, char const *argv[])
     getInformationBME280(&temperatureExternal, &humidity);
 
     float temperatureExt = (float)temperatureExternal/100;
-    float humidityParser = (float)humidity/100;
-    printf("Temperature: %f Humidity: %f\n", temperatureExt, humidityParser);
+    float humidityParser = (float)humidity/1000;
+    printf("Temperature: %.2f Humidity: %.2f\n", temperatureExt, humidityParser);
 
     return 0;
 }
