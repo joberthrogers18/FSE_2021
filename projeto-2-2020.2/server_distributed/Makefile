@@ -16,7 +16,7 @@ $(EXE): $(OBJ)
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $< -o $@ -lm -lpthread -lwiringPi
+	$(CC) $(CFLAGS) $< -o $@ -lm -lpthread
 
 clean:
 	-rm -f $(OBJDIR)/*.o $(EXE)
