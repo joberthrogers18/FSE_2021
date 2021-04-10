@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <socket.h>
 
 #define PORT_SERVER 10018
 #define IP_SERVER "192.168.0.52"
