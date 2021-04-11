@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 
     initSocket();
 
-    void listenSocket();
+    listenSocket();
 
     return 0;
 }

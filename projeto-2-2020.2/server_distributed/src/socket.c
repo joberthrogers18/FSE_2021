@@ -1,6 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <socket.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #define PORT_SERVER 10018
 #define IP_CLIENT "192.168.0.53"
@@ -21,16 +25,8 @@ void initSocket() {
 
     memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = htonl(IP_CLIENT);
+	serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddr.sin_port = htons(PORT_SERVER);
-
-
-
-    // connect server
-    if (connect(serverSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0){
-        printf("Error when connect with server\n");
-        exit(1);
-    }
 
     // Bind
 	if(bind(serverSocket, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0) {
@@ -45,7 +41,7 @@ void handlerCLientRequest() {
     int sizeReceive;
 
     if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
-        print("Error when receive request\n");
+        printf("Error when receive request\n");
     }
 
     while (sizeReceive > 0) {
@@ -57,16 +53,18 @@ void handlerCLientRequest() {
             printf("Error when try receive responde \n");
         }
 
-        print("current message: %s\n", buffer);
+        printf("current message: %s\n", buffer);
     }
 }
 
 void listenSocket() {
+    printf("Passou aqui\n");
     if (listen(serverSocket, NUMBER_QUEUE) < 0) {
         printf("Failed in listening\n");
     }
 
     while(1) {
+        printf("Aqui\n");
         clientLength = sizeof(clientAddr);
 
         if ((socketClient = accept(serverSocket, (struct sockaddr *) &clientAddr, &clientLength)) < 0) {
