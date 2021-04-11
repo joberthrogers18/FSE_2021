@@ -8,7 +8,7 @@
 
 
 #define PORT_SERVER 10018
-#define IP_SERVER "192.168.0.52"
+#define IP_SERVER "192.168.0.4"
 
 struct sockaddr_in serverAddr;
 int clientSocket;
