@@ -6,6 +6,10 @@
 #include <socket.h>
 #include <unistd.h>
 #include <signal.h>
+#include <wiringPi.h>
+
+#define ON 1
+#define OFF 0
 
 #define ADDRESS_BME280 0x76
 #define CHANNEL_BME280 1
@@ -30,6 +34,25 @@ int main(int argc, char const *argv[])
 {
     signal(SIGINT, finishResources);
 
+    wiringPiSetup();
+
+    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, ON);
+    turnONOrOFFDevice(PIN_LAMP_2_ROOM, ON);
+    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, ON);
+    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, ON);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, ON);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, ON);
+
+    sleep(5);
+
+    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, OFF);
+    turnONOrOFFDevice(PIN_LAMP_2_ROOM, OFF);
+    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, OFF);
+    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, OFF);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, OFF);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, OFF);
+
+
     // initResources();
     // getInformationBME280(&temperatureExternal, &humidity);
 
@@ -37,19 +60,9 @@ int main(int argc, char const *argv[])
     // float humidityParser = (float)humidity/1000;
     // printf("Temperature: %.2f Humidity: %.2f\n", temperatureExt, humidityParser);
 
-    // initPinsGPIO();
+    // initSocket();
 
-    // turnOnGPIO();
-
-    // sleep(10);
-
-    // turnOffGPIO();
-
-    // closeGPIO();
-
-    initSocket();
-
-    listenSocket();
+    // listenSocket();
 
     return 0;
 }
