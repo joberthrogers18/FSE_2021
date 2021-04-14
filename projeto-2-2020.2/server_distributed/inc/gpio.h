@@ -1,6 +1,26 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
+struct pinState {
+  int lamp1;
+  int lamp2;
+  int lamp3;
+  int lamp4;
+  int arCondition1;
+  int arCondition2;
+  
+  int sensorPres1;
+  int sensorPres2;
+  int sensorDoorKitchen;
+  int sensorWindowKitchen;
+  int sensorDoorRoom;
+  int sensorWindowRoom;
+  int sensorWindowBedroom1;
+  int sensorWindowBedroom2;
+};
+
+struct pinState state;
+
 // outputs
 #define PIN_LAMP_1_KITCHEN     0 // pin 17
 #define PIN_LAMP_2_ROOM        1 // pin 18
@@ -20,6 +40,7 @@
 #define PIN_SENSOR_WINDOW_BEDROOM_02 29 //pin 21
 
 void turnONOrOFFDevice(int pin, int isOn);
+void *initializeInteruption();
 // void initPinsGPIO();
 // void turnOnGPIO();
 // void turnOffGPIO();
