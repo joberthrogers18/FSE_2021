@@ -55,6 +55,8 @@ void handlerCLientRequest() {
     state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
     state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
 
+    printf("Aqui: %d\n", state.lamp1->valueint);
+
     while (sizeReceive > 0) {
         if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
             printf("Error when send try send message\n");
@@ -64,7 +66,7 @@ void handlerCLientRequest() {
             printf("Error when try receive responde \n");
         }
 
-        printf("current message: %s\n", buffer);
+        // printf("current message: %s\n", buffer);
     }
 
     free(buffer);

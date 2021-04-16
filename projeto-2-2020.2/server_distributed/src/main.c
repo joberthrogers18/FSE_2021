@@ -19,7 +19,6 @@
 
 struct pinState state;
 
-
 pthread_t threads[2];
 int temperatureExternal = 0.0;
 int humidity = 0.0;
@@ -37,12 +36,15 @@ void initResources() {
     
     wiringPiSetup();
     // csvCreation();
+    initSocket();
+
+    listenSocket();
     pthread_create(&threads[0], NULL, initializeStateHandle, NULL);
     pthread_detach(threads[0]);
 }
 
 void finishResources(){
-    // closeSocket();
+    closeSocket();
     exit(0);
 }
 
@@ -76,7 +78,7 @@ int main(int argc, char const *argv[])
         getInformationBME280(&temperatureExternal, &humidity);
         temperatureExt = (float)temperatureExternal/100;
         humidityParser = (float)humidity/1000;
-        printLog(temperatureExt, humidityParser, state);
+        // printLog(temperatureExt, humidityParser, state);
         sleep(1);
     }
 
@@ -102,10 +104,6 @@ int main(int argc, char const *argv[])
     // float temperatureExt = (float)temperatureExternal/100;
     // float humidityParser = (float)humidity/1000;
     // printf("Temperature: %.2f Humidity: %.2f\n", temperatureExt, humidityParser);
-
-    // initSocket();
-
-    // listenSocket();
 
     return 0;
 }

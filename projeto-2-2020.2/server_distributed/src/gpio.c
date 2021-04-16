@@ -185,15 +185,6 @@ void *printLog(float temperature, float humidity, struct pinState status) {
         state.sensorWindowBedroom1->valueint, 
         state.sensorWindowBedroom2->valueint
     );
-
-    // if(state.lamp1->valueint == 0) {
-    //   printf("Aceso\n");
-    // }
-
-    // if(state.lamp1->valueint == 1) {
-    //   printf("Apagado\n");
-    // }
-    // addInfoFileCsv(temperature, humidity);
-
+    
     return;
 }
