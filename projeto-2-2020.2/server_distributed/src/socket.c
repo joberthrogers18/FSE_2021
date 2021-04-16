@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <cJSON.h>
+#include <gpio.h>
 
 #define PORT_SERVER 10018
 #define IP_CLIENT "192.168.0.53"
@@ -15,6 +17,7 @@ int socketClient;
 struct sockaddr_in serverAddr;
 struct sockaddr_in clientAddr;
 unsigned int clientLength;
+extern char *buffer;
 
 void initSocket() {
     // create a Socket 
@@ -37,12 +40,20 @@ void initSocket() {
 }
 
 void handlerCLientRequest() {
-    char buffer[16];
+    buffer = malloc(sizeof(char) * 1100);
     int sizeReceive;
 
-    if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
+    if ((sizeReceive = recv(socketClient, buffer, 1100, 0)) < 0) {
         printf("Error when receive request\n");
     }
+
+    cJSON *dataStatus = cJSON_Parse(buffer);
+    state.lamp1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp1");
+    state.lamp2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp2");
+    state.lamp3 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp3");
+    state.lamp4 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp4");
+    state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
+    state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
 
     while (sizeReceive > 0) {
         if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
@@ -55,16 +66,16 @@ void handlerCLientRequest() {
 
         printf("current message: %s\n", buffer);
     }
+
+    free(buffer);
 }
 
 void listenSocket() {
-    printf("Passou aqui\n");
     if (listen(serverSocket, NUMBER_QUEUE) < 0) {
         printf("Failed in listening\n");
     }
 
     while(1) {
-        printf("Aqui\n");
         clientLength = sizeof(clientAddr);
 
         if ((socketClient = accept(serverSocket, (struct sockaddr *) &clientAddr, &clientLength)) < 0) {
@@ -74,6 +85,10 @@ void listenSocket() {
         handlerCLientRequest();
     }
 }
+
+// void *send_message() {
+
+// }
 
 void closeSocket() {
     close(socketClient);

@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <socket.h>
+#include <gpio.h>
+#include <cJSON.h>
 
 
 #define PORT_SERVER 10018
@@ -19,6 +21,7 @@ int bytesRecebidos;
 int totalBytesRecebidos;
 int totalBytesReceived;
 int bytesReceived;
+extern struct pinState state;
 
 void initSocket() {
     // create a Socket 
@@ -40,10 +43,21 @@ void initSocket() {
     }
 }
 
-void sendMessage(char *message){
-    unsigned sizeMessage = strlen(message);
+void sendMessage(){
+    cJSON *dataStatus = cJSON_CreateObject();
+    // cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature));
+    // cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity));
+    cJSON_AddItemToObject(dataStatus, "lamp1", cJSON_CreateNumber(state.lamp1->valueint));
+    cJSON_AddItemToObject(dataStatus, "lamp2", cJSON_CreateNumber(state.lamp2->valueint));
+    cJSON_AddItemToObject(dataStatus, "lamp3", cJSON_CreateNumber(state.lamp3->valueint));
+    cJSON_AddItemToObject(dataStatus, "lamp4", cJSON_CreateNumber(state.lamp4->valueint));
+    cJSON_AddItemToObject(dataStatus, "ar1", cJSON_CreateNumber(state.arCondition1->valueint));
+    cJSON_AddItemToObject(dataStatus, "ar2", cJSON_CreateNumber(state.arCondition2->valueint));
 
-    if (send(clientSocket, message, sizeMessage, 0) != sizeMessage){
+    char *parseDataStatus = cJSON_Print(dataStatus);
+    unsigned sizeMessage = strlen(parseDataStatus);
+
+    if (send(clientSocket, parseDataStatus, strlen(parseDataStatus), 0) != sizeMessage){
         printf("Error when send message: number of bytes different from was send.");
     }
 

@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "*.jsx": "Javascript React",
+        "*.js": "javascriptreact",
+        "socket.h": "c",
+        "string": "c",
+        "stdio.h": "c",
+        "cjson.h": "c",
+        "gpio.h": "c",
+        "tuple": "c",
+        "*.tcc": "c",
+        "optional": "c",
+        "functional": "c",
+        "random": "c",
+        "fstream": "c",
+        "istream": "c",
+        "ostream": "c",
+        "sstream": "c",
+        "streambuf": "c"
+    }
+}

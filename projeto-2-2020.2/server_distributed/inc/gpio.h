@@ -1,25 +1,27 @@
+#include <cJSON.h>
+
 #ifndef GPIO_H_
 #define GPIO_H_
 
 struct pinState {
-  int lamp1;
-  int lamp2;
-  int lamp3;
-  int lamp4;
-  int arCondition1;
-  int arCondition2;
+  cJSON *lamp1;
+  cJSON *lamp2;
+  cJSON *lamp3;
+  cJSON *lamp4;
+  cJSON *arCondition1;
+  cJSON *arCondition2;
   
-  int sensorPres1;
-  int sensorPres2;
-  int sensorDoorKitchen;
-  int sensorWindowKitchen;
-  int sensorDoorRoom;
-  int sensorWindowRoom;
-  int sensorWindowBedroom1;
-  int sensorWindowBedroom2;
+  cJSON *sensorPres1;
+  cJSON *sensorPres2;
+  cJSON *sensorDoorKitchen;
+  cJSON *sensorWindowKitchen;
+  cJSON *sensorDoorRoom;
+  cJSON *sensorWindowRoom;
+  cJSON *sensorWindowBedroom1;
+  cJSON *sensorWindowBedroom2;
 };
 
-struct pinState state;
+extern struct pinState state;
 
 // outputs
 #define PIN_LAMP_1_KITCHEN     0 // pin 17
@@ -39,12 +41,9 @@ struct pinState state;
 #define PIN_SENSOR_WINDOW_BEDROOM_01 28 //pin 20
 #define PIN_SENSOR_WINDOW_BEDROOM_02 29 //pin 21
 
+void *printLog(float temperature, float humidity, struct pinState status);
 void turnONOrOFFDevice(int pin, int isOn);
-void *initializeInteruption();
-// void initPinsGPIO();
-// void turnOnGPIO();
-// void turnOffGPIO();
-// void closeGPIO();
-
+void *initializeStateHandle();
+void *initialHandle();
 
 #endif

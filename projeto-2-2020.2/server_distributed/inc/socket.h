@@ -6,4 +6,6 @@ void handlerCLientRequest();
 void listenSocket();
 void closeSocket();
 
+char *buffer;
+
 #endif

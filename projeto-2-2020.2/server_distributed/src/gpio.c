@@ -5,12 +5,11 @@
 #include <sys/time.h>
 #include <wiringPi.h>
 #include <softPwm.h>
+#include <cJSON.h>
 
 #define MIN_RANGE_PWM 0
 #define MAX_RANGE_PWM 100
 #define IGNORE_CHANGE_BELOW_USEC 10000
-
-extern struct pinState state;
 
 struct timeval last_change;
 
@@ -38,42 +37,42 @@ void initializePinSensors() {
 }
 
 void getStateOfPin() {
-  state.sensorPres1 = digitalRead(PIN_SENSOR_PRES_01);
-  state.sensorPres2 = digitalRead(PIN_SENSOR_PRES_02);
-  state.sensorDoorKitchen = digitalRead(PIN_SENSOR_DOOR_KITCHEN);
-  state.sensorWindowKitchen = digitalRead(PIN_SENSOR_WINDOW_KITCHEN);
-  state.sensorDoorRoom = digitalRead(PIN_SENSOR_DOOR_ROOM);
-  state.sensorWindowRoom = digitalRead(PIN_SENSOR_WINDOW_ROOM);
-  state.sensorWindowBedroom1 = digitalRead(PIN_SENSOR_WINDOW_BEDROOM_01);
-  state.sensorWindowBedroom2 = digitalRead(PIN_SENSOR_WINDOW_BEDROOM_02);
+  state.sensorPres1 = cJSON_CreateNumber(digitalRead(PIN_SENSOR_PRES_01));
+  state.sensorPres2 = cJSON_CreateNumber(digitalRead(PIN_SENSOR_PRES_02));
+  state.sensorDoorKitchen = cJSON_CreateNumber(digitalRead(PIN_SENSOR_DOOR_KITCHEN));
+  state.sensorWindowKitchen = cJSON_CreateNumber(digitalRead(PIN_SENSOR_WINDOW_KITCHEN));
+  state.sensorDoorRoom = cJSON_CreateNumber(digitalRead(PIN_SENSOR_DOOR_ROOM));
+  state.sensorWindowRoom = cJSON_CreateNumber(digitalRead(PIN_SENSOR_WINDOW_ROOM));
+  state.sensorWindowBedroom1 = cJSON_CreateNumber(digitalRead(PIN_SENSOR_WINDOW_BEDROOM_01));
+  state.sensorWindowBedroom2 = cJSON_CreateNumber(digitalRead(PIN_SENSOR_WINDOW_BEDROOM_02));
 }
 
 void changeState(int currentState) {
   switch (currentState)
   {
     case PIN_SENSOR_PRES_01:
-      state.sensorPres1 = !state.sensorPres1;
+      state.sensorPres1 = cJSON_CreateNumber(!state.sensorPres1->valueint);
       break;
     case PIN_SENSOR_PRES_02:
-      state.sensorPres2 = !state.sensorPres2;
+      state.sensorPres2 = cJSON_CreateNumber(!state.sensorPres2->valueint);
       break;
     case PIN_SENSOR_DOOR_KITCHEN:
-      state.sensorDoorKitchen = !state.sensorDoorKitchen;
+      state.sensorDoorKitchen = cJSON_CreateNumber(!state.sensorDoorKitchen->valueint);
       break;
     case PIN_SENSOR_WINDOW_KITCHEN:
-      state.sensorWindowKitchen = !state.sensorWindowKitchen;
+      state.sensorWindowKitchen = cJSON_CreateNumber(!state.sensorWindowKitchen->valueint);
       break;
     case PIN_SENSOR_DOOR_ROOM:
-      state.sensorDoorRoom = !state.sensorDoorRoom;
+      state.sensorDoorRoom = cJSON_CreateNumber(!state.sensorDoorRoom->valueint);
       break;
     case PIN_SENSOR_WINDOW_ROOM:
-      state.sensorWindowRoom = !state.sensorWindowRoom;
+      state.sensorWindowRoom = cJSON_CreateNumber(!state.sensorWindowRoom->valueint);
       break;
     case PIN_SENSOR_WINDOW_BEDROOM_01:
-      state.sensorWindowBedroom1 = !state.sensorWindowBedroom1;
+      state.sensorWindowBedroom1 = cJSON_CreateNumber(!state.sensorWindowBedroom1->valueint);
       break;
     case PIN_SENSOR_WINDOW_BEDROOM_02:
-      state.sensorWindowBedroom2 = !state.sensorWindowBedroom2;
+      state.sensorWindowBedroom2 = cJSON_CreateNumber(!state.sensorWindowBedroom2->valueint);
       break;
     default:
       break;
@@ -104,35 +103,35 @@ void handle(int currentState, int typeState, char* sensor) {
 }
 
 void handleSensorPresence1() {
-  handle(state.sensorPres1, PIN_SENSOR_PRES_01, "Sensor presence 01");
+  handle(state.sensorPres1->valueint, PIN_SENSOR_PRES_01, "Sensor presence 01");
 }
 
 void handleSensorPresence2() {
-  handle(state.sensorPres2, PIN_SENSOR_PRES_02, "Sensor presence 02");
+  handle(state.sensorPres2->valueint, PIN_SENSOR_PRES_02, "Sensor presence 02");
 }
 
 void handleSensorDoorKitchen() {
-  handle(state.sensorDoorKitchen, PIN_SENSOR_DOOR_KITCHEN, "Sensor door kitchen");
+  handle(state.sensorDoorKitchen->valueint, PIN_SENSOR_DOOR_KITCHEN, "Sensor door kitchen");
 }
 
 void handleSensorWindowKitchen() {
-  handle(state.sensorWindowKitchen, PIN_SENSOR_WINDOW_KITCHEN, "Sensor window kitchen");
+  handle(state.sensorWindowKitchen->valueint, PIN_SENSOR_WINDOW_KITCHEN, "Sensor window kitchen");
 }
 
 void handleSensorDoorRoom() {
-  handle(state.sensorDoorRoom, PIN_SENSOR_DOOR_ROOM, "Sensor door room");
+  handle(state.sensorDoorRoom->valueint, PIN_SENSOR_DOOR_ROOM, "Sensor door room");
 }
 
 void handleSensorWindowRoom() {
-  handle(state.sensorWindowRoom, PIN_SENSOR_WINDOW_ROOM, "Sensor window room");
+  handle(state.sensorWindowRoom->valueint, PIN_SENSOR_WINDOW_ROOM, "Sensor window room");
 }
 
 void handleSensorWindowBedroom1() {
-  handle(state.sensorWindowBedroom1, PIN_SENSOR_WINDOW_BEDROOM_01, "Sensor bedroom 1");
+  handle(state.sensorWindowBedroom1->valueint, PIN_SENSOR_WINDOW_BEDROOM_01, "Sensor bedroom 1");
 }
 
 void handleSensorWindowBedroom2() {
-  handle(state.sensorWindowBedroom2, PIN_SENSOR_WINDOW_BEDROOM_02, "Sensor bedroom 2");
+  handle(state.sensorWindowBedroom2->valueint, PIN_SENSOR_WINDOW_BEDROOM_02, "Sensor bedroom 2");
 }
 
 void bindInterupts() {
@@ -146,8 +145,7 @@ void bindInterupts() {
   wiringPiISR(PIN_SENSOR_WINDOW_BEDROOM_02, INT_EDGE_BOTH,  &handleSensorWindowBedroom2); 
 }
 
-void *initializeInteruption() {
-  wiringPiSetup();
+void *initializeStateHandle() {
 
   // initialize all pins like OUTPUT
   initializePinSensors();
@@ -161,4 +159,41 @@ void *initializeInteruption() {
   for (;;) {
     sleep(1);
   }
+}
+
+void *printLog(float temperature, float humidity, struct pinState status) {
+    printf("\n\n========== VALORES COLETADOS ==========\n");
+    printf("Temperatura: %.3fC° Umidade: %.3f%%\n", temperature, humidity);
+
+    printf(
+        "L1: %d L2: %d L3: %d L4: %d AR1: %d AR2: %d\n", 
+        state.lamp1->valueint, 
+        state.lamp2->valueint, 
+        state.lamp3->valueint, 
+        state.lamp4->valueint, 
+        state.arCondition1->valueint, 
+        state.arCondition2->valueint
+    );
+
+    printf("SP1: %d SP2: %d SDK: %d SWK: %d SDR: %d SWR: %d SWB1: %d SWB2: %d\n", 
+        state.sensorPres1->valueint, 
+        state.sensorPres2->valueint, 
+        state.sensorDoorKitchen->valueint, 
+        state.sensorWindowKitchen->valueint, 
+        state.sensorDoorRoom->valueint, 
+        state.sensorWindowRoom->valueint, 
+        state.sensorWindowBedroom1->valueint, 
+        state.sensorWindowBedroom2->valueint
+    );
+
+    // if(state.lamp1->valueint == 0) {
+    //   printf("Aceso\n");
+    // }
+
+    // if(state.lamp1->valueint == 1) {
+    //   printf("Apagado\n");
+    // }
+    // addInfoFileCsv(temperature, humidity);
+
+    return;
 }

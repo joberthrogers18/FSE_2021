@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <signal.h>
 #include <wiringPi.h>
+#include <utils.h>
+#include <cJSON.h>
 
 #define ON 1
 #define OFF 0
@@ -15,41 +17,68 @@
 #define ADDRESS_BME280 0x76
 #define CHANNEL_BME280 1
 
-int temperatureExternal = 0.0;
-int humidity = 0.0;
+struct pinState state;
+
 
 pthread_t threads[2];
+int temperatureExternal = 0.0;
+int humidity = 0.0;
+float temperatureExt = 0.0;
+float humidityParser = 0.0;
 
 void initResources() {
     int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
-	if (i != 0)
+	
+    if (i != 0)
 	{
 		printf("Erro to open\n");
         exit(1);
 	}
+    
+    wiringPiSetup();
+    // csvCreation();
+    pthread_create(&threads[0], NULL, initializeStateHandle, NULL);
+    pthread_detach(threads[0]);
 }
 
 void finishResources(){
-    pthread_join(threads[0], NULL);
-    closeSocket();
+    // closeSocket();
     exit(0);
+}
+
+void initializeStates() {
+    state.lamp1 = cJSON_CreateNumber(0);
+    state.lamp2 = cJSON_CreateNumber(0);
+    state.lamp3 = cJSON_CreateNumber(0);
+    state.lamp4 = cJSON_CreateNumber(0);
+    state.arCondition1 = cJSON_CreateNumber(0);
+    state.arCondition2 = cJSON_CreateNumber(0);
+    state.sensorPres1 = cJSON_CreateNumber(0);
+    state.sensorPres2 = cJSON_CreateNumber(0);
+    state.sensorDoorKitchen = cJSON_CreateNumber(0);
+    state.sensorWindowKitchen = cJSON_CreateNumber(0);
+    state.sensorWindowRoom = cJSON_CreateNumber(0);
+    state.sensorDoorRoom = cJSON_CreateNumber(0);
+    state.sensorWindowRoom = cJSON_CreateNumber(0);
+    state.sensorWindowBedroom1 = cJSON_CreateNumber(0);
+    state.sensorWindowBedroom2 = cJSON_CreateNumber(0);
 }
 
 int main(int argc, char const *argv[])
 {
     signal(SIGINT, finishResources);
 
-    pthread_create(&threads[0], NULL, initializeInteruption, NULL);
-    
+    initResources();
+    initializeStates();
+
     while (1)
     {
-        printf("Lamp 1: %d, Lamp 2: %d, Lamp 3: %d, Lamp 4: %d \n", state.lamp1, state.lamp2, state.lamp3, state.lamp4);
-        printf("Ar Condition 1: %d, Ar Condition 2: %d \n", state.arCondition1, state.arCondition2);
-        printf("Sensor Pres. 1: %d, Sensor Pres. 2: %d, Sensor Door Kitchen: %d, Sensor Window Kitchen: %d \n", state.sensorPres1, state.sensorPres1, state.sensorDoorKitchen, state.sensorWindowKitchen);
-        printf("Sensor Door Room: %d, Sensor Window Room: %d, Sensor Window Bedroom1: %d, Sensor Window Bedroom2: %d \n", state.sensorDoorRoom, state.sensorWindowRoom, state.sensorWindowBedroom1, state.sensorWindowBedroom2);
+        getInformationBME280(&temperatureExternal, &humidity);
+        temperatureExt = (float)temperatureExternal/100;
+        humidityParser = (float)humidity/1000;
+        printLog(temperatureExt, humidityParser, state);
         sleep(1);
     }
-    
 
     // wiringPiSetup();
 
@@ -69,11 +98,6 @@ int main(int argc, char const *argv[])
     // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, OFF);
     // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, OFF);
 
-
-
-
-    // initResources();
-    // getInformationBME280(&temperatureExternal, &humidity);
 
     // float temperatureExt = (float)temperatureExternal/100;
     // float humidityParser = (float)humidity/1000;
