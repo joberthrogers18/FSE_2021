@@ -5,7 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <socket.h>
-#include <gpio.h>
 #include <cJSON.h>
 
 

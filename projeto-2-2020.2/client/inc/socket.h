@@ -21,7 +21,7 @@ struct pinState {
   cJSON *sensorWindowBedroom2;
 };
 
-struct pinState state;
+extern struct pinState state;
 
 void initSocket();
 void sendMessage();

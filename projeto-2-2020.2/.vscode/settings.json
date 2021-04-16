@@ -16,6 +16,10 @@
         "istream": "c",
         "ostream": "c",
         "sstream": "c",
-        "streambuf": "c"
+        "streambuf": "c",
+        "signal.h": "c",
+        "unistd.h": "c",
+        "utils.h": "c",
+        "stdlib.h": "c"
     }
 }
