@@ -12,11 +12,11 @@ EXE = bin/bin
 all: clean $(EXE) 
     
 $(EXE): $(OBJ) 
-	$(CC) $(LDFLAGS) $(OBJDIR)/*.o -o $@ -lwiringPi
+	$(CC) $(LDFLAGS) $(OBJDIR)/*.o -o $@ -lncurses -lpthread
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $< -o $@ -lm -lpthread
+	$(CC) $(CFLAGS) $< -o $@ -lm -lpthread -lncurses
 
 clean:
 	-rm -f $(OBJDIR)/*.o $(EXE)
