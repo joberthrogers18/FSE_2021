@@ -11,9 +11,6 @@
 #include <utils.h>
 #include <cJSON.h>
 
-#define ON 1
-#define OFF 0
-
 #define ADDRESS_BME280 0x76
 #define CHANNEL_BME280 1
 
@@ -35,6 +32,7 @@ void initResources() {
 	}
     
     wiringPiSetup();
+    turnOFFAllDevices();
     // csvCreation();
     initSocket();
 

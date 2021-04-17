@@ -5,6 +5,7 @@ void initSocket();
 void handlerCLientRequest();
 void listenSocket();
 void closeSocket();
+void turnOFFAllDevices();
 
 char *buffer;
 

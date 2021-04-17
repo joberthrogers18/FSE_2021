@@ -11,6 +11,8 @@
 #define PORT_SERVER 10018
 #define IP_CLIENT "192.168.0.53"
 #define NUMBER_QUEUE 20
+// #define ON 1
+#define OFF 0
 
 int serverSocket;
 int socketClient;
@@ -36,7 +38,24 @@ void initSocket() {
 		printf("Failed tried bind. Try again later!\n");
         exit(1);
     }
+}
 
+void turnOFFAllDevices() {
+    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, OFF);
+    turnONOrOFFDevice(PIN_LAMP_2_ROOM, OFF);
+    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, OFF);
+    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, OFF);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, OFF);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, OFF);
+}
+
+void handleDeviceState() {
+    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
+    turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
+    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
+    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, state.lamp4->valueint);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, state.arCondition1->valueint);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, state.arCondition2->valueint);
 }
 
 void handlerCLientRequest() {
@@ -55,7 +74,7 @@ void handlerCLientRequest() {
     state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
     state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
 
-    printf("Aqui: %d\n", state.lamp1->valueint);
+    handleDeviceState();
 
     while (sizeReceive > 0) {
         if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
@@ -65,8 +84,6 @@ void handlerCLientRequest() {
         if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
             printf("Error when try receive responde \n");
         }
-
-        // printf("current message: %s\n", buffer);
     }
 
     free(buffer);
