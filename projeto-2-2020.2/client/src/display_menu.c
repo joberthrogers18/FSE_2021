@@ -36,10 +36,18 @@ void *display_states(void *arg) {
         sleep(1);
         mvwprintw(logs, LINE_START, (int) xMax / 2, "ESTADOS");
         mvwprintw(logs, LINE_START + 1, 5, "");
-        mvwprintw(logs, LINE_START + 2, 5, "Lâmpadas 1: %d; Lâmpadas 2: %d; Lâmpadas 3:% d; Lâmpadas 4: %d", 0, 0, 0, 0);
-        mvwprintw(logs, LINE_START + 3, 5, "AR Condicionado1: %d; AR Condicionado 2: %d; Sensor Presença 1: %d; Sensor Presença 2: %d", 0, 0, 0, 0);
-        mvwprintw(logs, LINE_START + 4, 5, "Sensor Porta C: %d; Sensor Janela C: %d; Sensor Porta S: %d", 0, 0, 0);
-        mvwprintw(logs, LINE_START + 5, 5, "Sensor Janela C: %d; Sensor Janela Q1: %d; Sensor Janela Q2: %d", 0, 0, 0);
+        mvwprintw(logs, LINE_START + 2, 5, "Lâmpadas 1: %d; Lâmpadas 2: %d; Lâmpadas 3:% d; Lâmpadas 4: %d", 
+            state.lamp1->valueint, state.lamp2->valueint, state.lamp3->valueint, state.lamp4->valueint
+        );
+        mvwprintw(logs, LINE_START + 3, 5, "AR Condicionado1: %d; AR Condicionado 2: %d; Sensor Presença 1: %d; Sensor Presença 2: %d", 
+            state.arCondition1->valueint, state.arCondition2->valueint, state.sensorPres1->valueint, state.sensorPres2->valueint
+        );
+        mvwprintw(logs, LINE_START + 4, 5, "Sensor Porta C: %d; Sensor Janela C: %d; Sensor Porta S: %d", 
+            state.sensorDoorKitchen->valueint, state.sensorWindowKitchen->valueint, state.sensorDoorRoom->valueint
+        );
+        mvwprintw(logs, LINE_START + 5, 5, "Sensor Janela S: %d; Sensor Janela Q1: %d; Sensor Janela Q2: %d", 
+            state.sensorWindowRoom->valueint, state.sensorWindowBedroom1->valueint, state.sensorWindowBedroom2->valueint
+        );
         mvwprintw(logs, LINE_START + 6, 5, "Temperatura: %.2lf C°; Umidade: %.2lf %%", 0, 0);
 
         attron(A_BOLD);
@@ -68,8 +76,8 @@ void display_alert() {
     mvwprintw(menu, LINE_START, (int) xMax / 2, "MENU\n");
     mvwprintw(menu, LINE_START + 2, 5, "Não exite esse tipo de dispositivo, tente novamente.");
 
+    wrefresh(menu);
     sleep(5);
-    // wrefresh(menu);
     display_step_menu(LINE_START + 2);
 }
 
@@ -128,7 +136,7 @@ void *menu_handler(void *arg) {
 
                 mvwscanw(menu, SCAN_LINE, SCAN_COL, "%d", &value);
                 changeState(value, ON);
-                sendMessage();
+                // sendMessage();
                 // sprintf(posfix_code, "%d", value);
                 // strcpy(code, "L");
                 // strcat(code, posfix_code);
@@ -143,7 +151,7 @@ void *menu_handler(void *arg) {
 
                 sprintf(posfix_code, "%d", value);
                 changeState(value, OFF);
-                sendMessage();
+                // sendMessage();
                 // strcpy(code, "D");
                 // strcat(code, posfix_code);
                 break;

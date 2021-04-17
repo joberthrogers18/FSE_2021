@@ -23,8 +23,8 @@ struct pinState {
 
 extern struct pinState state;
 
-// void initSocket();
-// void sendMessage();
-// void closeSocket();
+void initSocket();
+void sendMessage();
+void closeSocket();
 
 #endif

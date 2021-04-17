@@ -96,8 +96,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <display_menu.h>
 #include <socket.h>
+#include <signal.h>
+#include <display_menu.h>
 
 struct pinState state;
 
@@ -119,9 +120,18 @@ void initializeStates() {
     state.sensorWindowBedroom2 = cJSON_CreateNumber(0);
 }
 
+void finishResources(){
+    closeSocket();
+    exit(0);
+}
+
 int main() {
     pthread_t thread_display_menu, thread_read_menu, thread_socket;
 
+    signal(SIGINT, finishResources);
+
+    initializeStates();
+    initSocket();
     init_menu();
 
     pthread_create(&thread_display_menu, NULL, display_states, NULL);
