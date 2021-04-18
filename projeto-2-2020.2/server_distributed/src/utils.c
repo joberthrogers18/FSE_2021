@@ -12,20 +12,20 @@ void csvCreation() {
     fclose(csvFile);
 }
 
-void addInfoFileCsv(float temperature, float humidity) {
+void addInfoFileCsv() {
     FILE* csvFile;
     time_t rawtime;
     struct tm * timeinfo;
     char buffer [80];
 
-    csvFile = fopen("project1.csv", "a+");
+    csvFile = fopen("measurements.csv", "a+");
 
     time (&rawtime);
     timeinfo = localtime (&rawtime);
 
     strftime (buffer,80,"%F %X",timeinfo);
 
-    fprintf(csvFile, "%s, %.3f, %.3f\n", buffer, temperature, humidity);
+    fprintf(csvFile, "%s, %.3f, %.3f\n", buffer, (float) state.temperature->valuedouble, (float) state.humidity->valuedouble);
 
     fclose(csvFile);
 }

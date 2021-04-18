@@ -11,6 +11,8 @@
 struct pinState state;
 
 void initializeStates() {
+    state.temperature = cJSON_CreateNumber(0.0);
+    state.humidity = cJSON_CreateNumber(0.0);
     state.lamp1 = cJSON_CreateNumber(0);
     state.lamp2 = cJSON_CreateNumber(0);
     state.lamp3 = cJSON_CreateNumber(0);
@@ -34,7 +36,7 @@ void finishResources(){
 }
 
 int main() {
-    pthread_t thread_display_menu, thread_read_menu, thread_socket;
+    pthread_t thread_display_menu, thread_read_menu, thread_message;
 
     signal(SIGINT, finishResources);
 
@@ -45,9 +47,12 @@ int main() {
 
     pthread_create(&thread_display_menu, NULL, display_states, NULL);
     pthread_create(&thread_read_menu, NULL, menu_handler, NULL);
+    pthread_create(&thread_message, NULL, sendMessageBySecond, NULL);
 
+    pthread_detach(thread_message);
     pthread_join(thread_display_menu, NULL);
     pthread_join(thread_read_menu, NULL);
+
 
     shut_down_menu();
 

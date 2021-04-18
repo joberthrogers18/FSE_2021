@@ -4,6 +4,8 @@
 #define SOCKET_H_
 
 struct pinState {
+  cJSON *temperature;
+  cJSON *humidity;
   cJSON *lamp1;
   cJSON *lamp2;
   cJSON *lamp3;
@@ -26,5 +28,6 @@ extern struct pinState state;
 void initSocket();
 void sendMessage();
 void closeSocket();
+void *sendMessageBySecond();
 
 #endif

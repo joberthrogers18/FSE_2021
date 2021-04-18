@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <socket.h>
 #include <cJSON.h>
+#include <utils.h>
 
 
 #define PORT_SERVER 10018
@@ -49,8 +50,8 @@ void sendMessage() {
     buffer = malloc(sizeof(char) * 2400);
 
     cJSON *dataStatus = cJSON_CreateObject();
-    // cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature));
-    // cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity));
+    cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature->valuedouble));
+    cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity->valuedouble));
     cJSON_AddItemToObject(dataStatus, "lamp1", cJSON_CreateNumber(state.lamp1->valueint));
     cJSON_AddItemToObject(dataStatus, "lamp2", cJSON_CreateNumber(state.lamp2->valueint));
     cJSON_AddItemToObject(dataStatus, "lamp3", cJSON_CreateNumber(state.lamp3->valueint));
@@ -78,8 +79,8 @@ void sendMessage() {
 
     read(clientSocket, buffer, 2400);
 
-    printf("%s\n", buffer);
-
+    state.temperature = cJSON_GetObjectItemCaseSensitive(dataStatus, "temperature");
+    state.humidity = cJSON_GetObjectItemCaseSensitive(dataStatus, "humidity");
     state.lamp1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp1");
     state.lamp2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp2");
     state.lamp3 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp3");
@@ -95,6 +96,8 @@ void sendMessage() {
     state.sensorWindowBedroom1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb1");
     state.sensorWindowBedroom2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb2");
 
+    addInfoFileCsv((float) state.temperature->valuedouble, (float) state.humidity->valuedouble);
+
 	// while(totalBytesReceived < sizeMessage) {
 	// 	if((bytesReceived = recv(clientSocket, buffer, 16-1, 0)) <= 0) {
 	// 		printf("The bytes sended was not receive!\n");
@@ -107,6 +110,15 @@ void sendMessage() {
 	// }
 
     free(buffer);
+}
+
+void *sendMessageBySecond() {
+    while (1)
+    {
+        sendMessage();
+        sleep(2);
+    }
+    
 }
 
 void closeSocket(){

@@ -23,23 +23,23 @@ float temperatureExt = 0.0;
 float humidityParser = 0.0;
 
 void initResources() {
-    int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
+    // int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	
-    if (i != 0)
-	{
-		printf("Erro to open\n");
-        exit(1);
-	}
+    // if (i != 0)
+	// {
+	// 	printf("Erro to open\n");
+    //     exit(1);
+	// }
     
     wiringPiSetup();
     initSocket();
     turnOFFAllDevices();
-    // csvCreation();
+    csvCreation();
 
     pthread_create(&threads[0], NULL, initializeStateHandle, NULL);
     pthread_detach(threads[0]);
     pthread_create(&threads[1], NULL, listenSocket, NULL);
-    pthread_detach(threads[0]);
+    pthread_detach(threads[1]);
 }
 
 void finishResources(){
@@ -48,6 +48,8 @@ void finishResources(){
 }
 
 void initializeStates() {
+    state.temperature = cJSON_CreateNumber(0.0);
+    state.humidity = cJSON_CreateNumber(0.0);
     state.lamp1 = cJSON_CreateNumber(0);
     state.lamp2 = cJSON_CreateNumber(0);
     state.lamp3 = cJSON_CreateNumber(0);

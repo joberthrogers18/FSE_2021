@@ -88,8 +88,8 @@ void handlerCLientRequest() {
     handleDeviceState();
 
     cJSON *sendDataStatus = cJSON_CreateObject();
-    // cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature));
-    // cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity));
+    cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature->valuedouble));
+    cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity->valuedouble));
     cJSON_AddItemToObject(sendDataStatus, "lamp1", cJSON_CreateNumber(state.sensorPres1->valueint));
     cJSON_AddItemToObject(sendDataStatus, "lamp2", cJSON_CreateNumber(state.lamp2->valueint));
     cJSON_AddItemToObject(sendDataStatus, "lamp3", cJSON_CreateNumber(state.lamp3->valueint));

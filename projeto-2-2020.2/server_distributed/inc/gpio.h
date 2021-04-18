@@ -4,6 +4,8 @@
 #define GPIO_H_
 
 struct pinState {
+  cJSON *temperature;
+  cJSON *humidity;
   cJSON *lamp1;
   cJSON *lamp2;
   cJSON *lamp3;
