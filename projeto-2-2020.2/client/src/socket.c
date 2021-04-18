@@ -62,16 +62,16 @@ void sendMessage(){
 
     totalBytesReceived = 0;
 
-	while(totalBytesReceived < sizeMessage) {
-		if((bytesReceived = recv(clientSocket, buffer, 16-1, 0)) <= 0) {
-			printf("The bytes sended was not receive!\n");
-        }
+	// while(totalBytesReceived < sizeMessage) {
+	// 	if((bytesReceived = recv(clientSocket, buffer, 16-1, 0)) <= 0) {
+	// 		printf("The bytes sended was not receive!\n");
+    //     }
 
-		totalBytesReceived += bytesReceived;
-		buffer[bytesReceived] = '\0';
+	// 	totalBytesReceived += bytesReceived;
+	// 	buffer[bytesReceived] = '\0';
 		
-        printf("%s\n", buffer);
-	}
+    //     printf("%s\n", buffer);
+	// }
 
 }
 

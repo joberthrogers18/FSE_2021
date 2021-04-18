@@ -136,11 +136,8 @@ void *menu_handler(void *arg) {
 
                 mvwscanw(menu, SCAN_LINE, SCAN_COL, "%d", &value);
                 changeState(value, ON);
-                // sendMessage();
-                // sprintf(posfix_code, "%d", value);
-                // strcpy(code, "L");
-                // strcat(code, posfix_code);
-
+                sendMessage();
+                // addInfoFileCsv(0, 0);
                 break;
 
             case 2:
@@ -151,9 +148,8 @@ void *menu_handler(void *arg) {
 
                 sprintf(posfix_code, "%d", value);
                 changeState(value, OFF);
-                // sendMessage();
-                // strcpy(code, "D");
-                // strcat(code, posfix_code);
+                sendMessage();
+                // addInfoFileCsv(0, 0);
                 break;
                 
             default:

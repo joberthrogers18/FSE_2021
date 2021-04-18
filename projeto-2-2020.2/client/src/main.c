@@ -131,6 +131,7 @@ int main() {
     signal(SIGINT, finishResources);
 
     initializeStates();
+    // csvCreation();
     initSocket();
     init_menu();
 
