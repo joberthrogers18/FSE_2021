@@ -146,7 +146,6 @@ void bindInterupts() {
 }
 
 void *initializeStateHandle() {
-
   // initialize all pins like OUTPUT
   initializePinSensors();
 

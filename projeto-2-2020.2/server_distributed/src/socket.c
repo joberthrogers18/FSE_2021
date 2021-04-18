@@ -38,6 +38,10 @@ void initSocket() {
 		printf("Failed tried bind. Try again later!\n");
         exit(1);
     }
+
+    if (listen(serverSocket, NUMBER_QUEUE) < 0) {
+        printf("Failed in listening\n");
+    }
 }
 
 void turnOFFAllDevices() {
@@ -50,21 +54,25 @@ void turnOFFAllDevices() {
 }
 
 void handleDeviceState() {
-    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
-    turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
-    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
-    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, state.lamp4->valueint);
-    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, state.arCondition1->valueint);
-    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, state.arCondition2->valueint);
+    printf("lamp1: %d; lamp2: %d;lamp3: %d; lamp4: %d\n", state.lamp2->valueint, state.lamp2->valueint, state.lamp3->valueint, state.lamp4->valueint);
+    printf("ar1: %d; ar1: %d;\n", state.arCondition1->valueint, state.arCondition2->valueint);
+    // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
+    // turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
+    // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
+    // turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, state.lamp4->valueint);
+    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, state.arCondition1->valueint);
+    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, state.arCondition2->valueint);
 }
 
 void handlerCLientRequest() {
     buffer = malloc(sizeof(char) * 1100);
-    int sizeReceive;
+    // int sizeReceive;
 
-    if ((sizeReceive = recv(socketClient, buffer, 1100, 0)) < 0) {
-        printf("Error when receive request\n");
-    }
+    // if ((sizeReceive = recv(socketClient, buffer, 1100, 0)) < 0) {
+    //     printf("Error when receive request\n");
+    // }
+
+    read(socketClient , buffer, 1100);
 
     cJSON *dataStatus = cJSON_Parse(buffer);
     state.lamp1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp1");
@@ -76,38 +84,30 @@ void handlerCLientRequest() {
 
     handleDeviceState();
 
-    while (sizeReceive > 0) {
-        if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
-            printf("Error when send try send message\n");
-        }
+    // while (sizeReceive > 0) {
+    //     if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
+    //         printf("Error when send try send message\n");
+    //     }
 
-        if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
-            printf("Error when try receive responde \n");
-        }
-    }
+    //     if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
+    //         printf("Error when try receive responde \n");
+    //     }
+    // }
 
     free(buffer);
 }
 
-void listenSocket() {
-    if (listen(serverSocket, NUMBER_QUEUE) < 0) {
-        printf("Failed in listening\n");
+void *listenSocket() {
+    clientLength = sizeof(clientAddr);
+
+    if ((socketClient = accept(serverSocket, (struct sockaddr *) &clientAddr, &clientLength)) < 0) {
+        printf("Failed in accept\n");    
     }
 
     while(1) {
-        clientLength = sizeof(clientAddr);
-
-        if ((socketClient = accept(serverSocket, (struct sockaddr *) &clientAddr, &clientLength)) < 0) {
-            printf("Failed in accept\n");    
-        }
-
         handlerCLientRequest();
     }
 }
-
-// void *send_message() {
-
-// }
 
 void closeSocket() {
     close(socketClient);

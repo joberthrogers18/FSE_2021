@@ -20,6 +20,9 @@
         "signal.h": "c",
         "unistd.h": "c",
         "utils.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "display_menu.h": "c",
+        "ncurses.h": "c",
+        "string.h": "c"
     }
 }

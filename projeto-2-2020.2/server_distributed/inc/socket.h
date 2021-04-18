@@ -3,7 +3,7 @@
 
 void initSocket();
 void handlerCLientRequest();
-void listenSocket();
+void *listenSocket();
 void closeSocket();
 void turnOFFAllDevices();
 

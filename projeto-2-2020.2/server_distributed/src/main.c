@@ -23,22 +23,25 @@ float temperatureExt = 0.0;
 float humidityParser = 0.0;
 
 void initResources() {
-    int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
+    // int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	
-    if (i != 0)
-	{
-		printf("Erro to open\n");
-        exit(1);
-	}
+    // if (i != 0)
+	// {
+	// 	printf("Erro to open\n");
+    //     exit(1);
+	// }
     
     wiringPiSetup();
+    initSocket();
     turnOFFAllDevices();
     // csvCreation();
-    initSocket();
 
-    listenSocket();
     pthread_create(&threads[0], NULL, initializeStateHandle, NULL);
     pthread_detach(threads[0]);
+    pthread_create(&threads[1], NULL, listenSocket, NULL);
+    pthread_detach(threads[0]);
+
+    // listenSocket();
 }
 
 void finishResources(){
