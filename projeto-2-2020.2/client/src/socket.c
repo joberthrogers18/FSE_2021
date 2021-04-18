@@ -79,22 +79,23 @@ void sendMessage() {
 
     read(clientSocket, buffer, 2400);
 
-    state.temperature = cJSON_GetObjectItemCaseSensitive(dataStatus, "temperature");
-    state.humidity = cJSON_GetObjectItemCaseSensitive(dataStatus, "humidity");
-    state.lamp1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp1");
-    state.lamp2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp2");
-    state.lamp3 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp3");
-    state.lamp4 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp4");
-    state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
-    state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
-    state.sensorPres1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "sp1");
-    state.sensorPres2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "sp2");
-    state.sensorDoorKitchen = cJSON_GetObjectItemCaseSensitive(dataStatus, "sdk");
-    state.sensorWindowKitchen = cJSON_GetObjectItemCaseSensitive(dataStatus, "swk");
-    state.sensorWindowRoom = cJSON_GetObjectItemCaseSensitive(dataStatus, "swr");
-    state.sensorDoorRoom = cJSON_GetObjectItemCaseSensitive(dataStatus, "sdr");
-    state.sensorWindowBedroom1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb1");
-    state.sensorWindowBedroom2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb2");
+    cJSON *receiveDataStatus = cJSON_Parse(buffer);
+    state.temperature = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "temperature");
+    state.humidity = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "humidity");
+    state.lamp1 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "lamp1");
+    state.lamp2 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "lamp2");
+    state.lamp3 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "lamp3");
+    state.lamp4 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "lamp4");
+    state.arCondition1 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "ar1");
+    state.arCondition2 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "ar2");
+    state.sensorPres1 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "sp1");
+    state.sensorPres2 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "sp2");
+    state.sensorDoorKitchen = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "sdk");
+    state.sensorWindowKitchen = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "swk");
+    state.sensorWindowRoom = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "swr");
+    state.sensorDoorRoom = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "sdr");
+    state.sensorWindowBedroom1 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "swb1");
+    state.sensorWindowBedroom2 = cJSON_GetObjectItemCaseSensitive(receiveDataStatus, "swb2");
 
     addInfoFileCsv((float) state.temperature->valuedouble, (float) state.humidity->valuedouble);
 
@@ -118,7 +119,6 @@ void *sendMessageBySecond() {
         sendMessage();
         sleep(2);
     }
-    
 }
 
 void closeSocket(){

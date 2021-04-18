@@ -59,6 +59,7 @@ void turnOFFAllDevices() {
 void handleDeviceState() {
     printf("lamp1: %d; lamp2: %d;lamp3: %d; lamp4: %d\n", state.lamp2->valueint, state.lamp2->valueint, state.lamp3->valueint, state.lamp4->valueint);
     printf("ar1: %d; ar1: %d;\n", state.arCondition1->valueint, state.arCondition2->valueint);
+    printf("sp1: %d; lamp2: %d\n", state.sensorPres1->valueint, state.sensorPres2->valueint);
     // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
     // turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
     // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
@@ -88,8 +89,8 @@ void handlerCLientRequest() {
     handleDeviceState();
 
     cJSON *sendDataStatus = cJSON_CreateObject();
-    cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature->valuedouble));
-    cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity->valuedouble));
+    cJSON_AddItemToObject(sendDataStatus, "temperature", cJSON_CreateNumber(state.temperature->valuedouble));
+    cJSON_AddItemToObject(sendDataStatus, "humidity", cJSON_CreateNumber(state.humidity->valuedouble));
     cJSON_AddItemToObject(sendDataStatus, "lamp1", cJSON_CreateNumber(state.sensorPres1->valueint));
     cJSON_AddItemToObject(sendDataStatus, "lamp2", cJSON_CreateNumber(state.lamp2->valueint));
     cJSON_AddItemToObject(sendDataStatus, "lamp3", cJSON_CreateNumber(state.lamp3->valueint));
@@ -105,7 +106,7 @@ void handlerCLientRequest() {
     cJSON_AddItemToObject(sendDataStatus, "swb1", cJSON_CreateNumber(state.sensorWindowBedroom1->valueint));
     cJSON_AddItemToObject(sendDataStatus, "swb2", cJSON_CreateNumber(state.sensorWindowBedroom2->valueint));
 
-    char *parseDataStatus = cJSON_Print(dataStatus);
+    char *parseDataStatus = cJSON_Print(sendDataStatus);
     unsigned sizeMessage = strlen(parseDataStatus);
 
     if (send(socketClient, parseDataStatus, strlen(parseDataStatus), 0) != sizeMessage){

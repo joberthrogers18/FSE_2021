@@ -25,7 +25,7 @@ void addInfoFileCsv(float temperature, float humidity) {
 
     strftime (buffer,80,"%F %X",timeinfo);
 
-    fprintf(csvFile, "%s, %.3f, %.3f, %d, %d, %d, %d, %d, %d\n", 
+    fprintf(csvFile, "%s, %.3f, %.3f, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", 
         buffer, 
         temperature, 
         humidity,

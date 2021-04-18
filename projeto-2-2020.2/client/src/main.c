@@ -41,7 +41,7 @@ int main() {
     signal(SIGINT, finishResources);
 
     initializeStates();
-    // csvCreation();
+    csvCreation();
     initSocket();
     init_menu();
 
