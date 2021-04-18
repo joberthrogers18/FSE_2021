@@ -14,6 +14,9 @@
 // #define ON 1
 #define OFF 0
 
+#define PORT_SERVER 10018
+#define IP_SERVER "192.168.0.4"
+
 int serverSocket;
 int socketClient;
 struct sockaddr_in serverAddr;
@@ -83,6 +86,31 @@ void handlerCLientRequest() {
     state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
 
     handleDeviceState();
+
+    cJSON *sendDataStatus = cJSON_CreateObject();
+    // cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature));
+    // cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity));
+    cJSON_AddItemToObject(sendDataStatus, "lamp1", cJSON_CreateNumber(state.sensorPres1->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "lamp2", cJSON_CreateNumber(state.lamp2->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "lamp3", cJSON_CreateNumber(state.lamp3->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "lamp4", cJSON_CreateNumber(state.lamp4->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "ar1", cJSON_CreateNumber(state.arCondition1->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "ar2", cJSON_CreateNumber(state.arCondition2->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "sp1", cJSON_CreateNumber(state.sensorPres2->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "sp2", cJSON_CreateNumber(state.sensorPres2->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "sdk", cJSON_CreateNumber(state.sensorDoorKitchen->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "swk", cJSON_CreateNumber(state.sensorWindowKitchen->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "swr", cJSON_CreateNumber(state.sensorWindowRoom->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "sdr", cJSON_CreateNumber(state.sensorDoorRoom->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "swb1", cJSON_CreateNumber(state.sensorWindowBedroom1->valueint));
+    cJSON_AddItemToObject(sendDataStatus, "swb2", cJSON_CreateNumber(state.sensorWindowBedroom2->valueint));
+
+    char *parseDataStatus = cJSON_Print(dataStatus);
+    unsigned sizeMessage = strlen(parseDataStatus);
+
+    if (send(socketClient, parseDataStatus, strlen(parseDataStatus), 0) != sizeMessage){
+        printf("Error when send message: number of bytes different from was send.");
+    }
 
     // while (sizeReceive > 0) {
     //     if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {

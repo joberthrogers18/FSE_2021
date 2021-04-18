@@ -128,6 +128,7 @@ void *menu_handler(void *arg) {
 
         switch (option) {
             case 0:
+                closeSocket();
                 break;
 
             case 1:

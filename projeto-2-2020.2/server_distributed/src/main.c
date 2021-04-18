@@ -23,13 +23,13 @@ float temperatureExt = 0.0;
 float humidityParser = 0.0;
 
 void initResources() {
-    // int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
+    int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	
-    // if (i != 0)
-	// {
-	// 	printf("Erro to open\n");
-    //     exit(1);
-	// }
+    if (i != 0)
+	{
+		printf("Erro to open\n");
+        exit(1);
+	}
     
     wiringPiSetup();
     initSocket();
@@ -40,8 +40,6 @@ void initResources() {
     pthread_detach(threads[0]);
     pthread_create(&threads[1], NULL, listenSocket, NULL);
     pthread_detach(threads[0]);
-
-    // listenSocket();
 }
 
 void finishResources(){
@@ -79,32 +77,8 @@ int main(int argc, char const *argv[])
         getInformationBME280(&temperatureExternal, &humidity);
         temperatureExt = (float)temperatureExternal/100;
         humidityParser = (float)humidity/1000;
-        // printLog(temperatureExt, humidityParser, state);
         sleep(1);
     }
-
-    // wiringPiSetup();
-
-    // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, ON);
-    // turnONOrOFFDevice(PIN_LAMP_2_ROOM, ON);
-    // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, ON);
-    // turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, ON);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, ON);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, ON);
-
-    // sleep(5);
-
-    // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, OFF);
-    // turnONOrOFFDevice(PIN_LAMP_2_ROOM, OFF);
-    // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, OFF);
-    // turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, OFF);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, OFF);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, OFF);
-
-
-    // float temperatureExt = (float)temperatureExternal/100;
-    // float humidityParser = (float)humidity/1000;
-    // printf("Temperature: %.2f Humidity: %.2f\n", temperatureExt, humidityParser);
 
     return 0;
 }

@@ -10,10 +10,13 @@
 
 #define PORT_SERVER 10018
 #define IP_SERVER "192.168.0.4"
+#define NUMBER_QUEUE 20
+
+#define IP_CLIENT "192.168.0.53"
 
 struct sockaddr_in serverAddr;
 int clientSocket;
-char buffer[16];
+char *buffer;
 unsigned int tamanhoMensagem;
 
 int bytesRecebidos;
@@ -42,7 +45,9 @@ void initSocket() {
     }
 }
 
-void sendMessage(){
+void sendMessage() {
+    buffer = malloc(sizeof(char) * 2400);
+
     cJSON *dataStatus = cJSON_CreateObject();
     // cJSON_AddItemToObject(dataStatus, "temperature", cJSON_CreateNumber(state.temperature));
     // cJSON_AddItemToObject(dataStatus, "humidity", cJSON_CreateNumber(state.humidity));
@@ -52,6 +57,15 @@ void sendMessage(){
     cJSON_AddItemToObject(dataStatus, "lamp4", cJSON_CreateNumber(state.lamp4->valueint));
     cJSON_AddItemToObject(dataStatus, "ar1", cJSON_CreateNumber(state.arCondition1->valueint));
     cJSON_AddItemToObject(dataStatus, "ar2", cJSON_CreateNumber(state.arCondition2->valueint));
+    cJSON_AddItemToObject(dataStatus, "sp1", cJSON_CreateNumber(state.sensorPres1->valueint));
+    cJSON_AddItemToObject(dataStatus, "sp2", cJSON_CreateNumber(state.sensorPres2->valueint));
+    cJSON_AddItemToObject(dataStatus, "sdk", cJSON_CreateNumber(state.sensorDoorKitchen->valueint));
+    cJSON_AddItemToObject(dataStatus, "swk", cJSON_CreateNumber(state.sensorWindowKitchen->valueint));
+    cJSON_AddItemToObject(dataStatus, "swr", cJSON_CreateNumber(state.sensorWindowRoom->valueint));
+    cJSON_AddItemToObject(dataStatus, "sdr", cJSON_CreateNumber(state.sensorDoorRoom->valueint));
+    cJSON_AddItemToObject(dataStatus, "swb1", cJSON_CreateNumber(state.sensorWindowBedroom1->valueint));
+    cJSON_AddItemToObject(dataStatus, "swb2", cJSON_CreateNumber(state.sensorWindowBedroom2->valueint));
+
 
     char *parseDataStatus = cJSON_Print(dataStatus);
     unsigned sizeMessage = strlen(parseDataStatus);
@@ -61,6 +75,25 @@ void sendMessage(){
     }
 
     totalBytesReceived = 0;
+
+    read(clientSocket, buffer, 2400);
+
+    printf("%s\n", buffer);
+
+    state.lamp1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp1");
+    state.lamp2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp2");
+    state.lamp3 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp3");
+    state.lamp4 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp4");
+    state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
+    state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
+    state.sensorPres1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "sp1");
+    state.sensorPres2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "sp2");
+    state.sensorDoorKitchen = cJSON_GetObjectItemCaseSensitive(dataStatus, "sdk");
+    state.sensorWindowKitchen = cJSON_GetObjectItemCaseSensitive(dataStatus, "swk");
+    state.sensorWindowRoom = cJSON_GetObjectItemCaseSensitive(dataStatus, "swr");
+    state.sensorDoorRoom = cJSON_GetObjectItemCaseSensitive(dataStatus, "sdr");
+    state.sensorWindowBedroom1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb1");
+    state.sensorWindowBedroom2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "swb2");
 
 	// while(totalBytesReceived < sizeMessage) {
 	// 	if((bytesReceived = recv(clientSocket, buffer, 16-1, 0)) <= 0) {
@@ -73,6 +106,7 @@ void sendMessage(){
     //     printf("%s\n", buffer);
 	// }
 
+    free(buffer);
 }
 
 void closeSocket(){
