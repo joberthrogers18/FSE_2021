@@ -17,6 +17,11 @@
 #define PORT_SERVER 10018
 #define IP_SERVER "192.168.0.4"
 
+int temperatureExternal = 0.0;
+int humidity = 0.0;
+float temperatureExt = 0.0;
+float humidityParser = 0.0;
+
 int serverSocket;
 int socketClient;
 struct sockaddr_in serverAddr;
@@ -59,7 +64,7 @@ void turnOFFAllDevices() {
 void handleDeviceState() {
     printf("lamp1: %d; lamp2: %d;lamp3: %d; lamp4: %d\n", state.lamp2->valueint, state.lamp2->valueint, state.lamp3->valueint, state.lamp4->valueint);
     printf("ar1: %d; ar1: %d;\n", state.arCondition1->valueint, state.arCondition2->valueint);
-    printf("sp1: %d; lamp2: %d\n", state.sensorPres1->valueint, state.sensorPres2->valueint);
+    printf("sp1: %d; lamp2: %d\n\n", state.sensorPres1->valueint, state.sensorPres2->valueint);
     // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
     // turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
     // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
@@ -85,6 +90,13 @@ void handlerCLientRequest() {
     state.lamp4 = cJSON_GetObjectItemCaseSensitive(dataStatus, "lamp4");
     state.arCondition1 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar1");
     state.arCondition2 = cJSON_GetObjectItemCaseSensitive(dataStatus, "ar2");
+
+    getInformationBME280(&temperatureExternal, &humidity);
+    temperatureExt = (float)temperatureExternal/100;
+    humidityParser = (float)humidity/1000;
+
+    state.temperature = cJSON_CreateNumber(temperatureExt);
+    state.humidity = cJSON_CreateNumber(humidityParser);
 
     handleDeviceState();
 

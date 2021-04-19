@@ -17,19 +17,15 @@
 struct pinState state;
 
 pthread_t threads[2];
-int temperatureExternal = 0.0;
-int humidity = 0.0;
-float temperatureExt = 0.0;
-float humidityParser = 0.0;
 
 void initResources() {
-    // int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
+    int i = bme280Init(CHANNEL_BME280, ADDRESS_BME280);
 	
-    // if (i != 0)
-	// {
-	// 	printf("Erro to open\n");
-    //     exit(1);
-	// }
+    if (i != 0)
+	{
+		printf("Erro to open\n");
+        exit(1);
+	}
     
     wiringPiSetup();
     initSocket();
