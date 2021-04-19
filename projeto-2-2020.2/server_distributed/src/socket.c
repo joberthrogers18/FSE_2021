@@ -76,11 +76,6 @@ void handleDeviceState() {
 
 void handlerCLientRequest() {
     buffer = malloc(sizeof(char) * 1100);
-    // int sizeReceive;
-
-    // if ((sizeReceive = recv(socketClient, buffer, 1100, 0)) < 0) {
-    //     printf("Error when receive request\n");
-    // }
 
     read(socketClient , buffer, 1100);
 
@@ -125,16 +120,6 @@ void handlerCLientRequest() {
     if (send(socketClient, parseDataStatus, strlen(parseDataStatus), 0) != sizeMessage){
         printf("Error when send message: number of bytes different from was send.");
     }
-
-    // while (sizeReceive > 0) {
-    //     if (send(socketClient, buffer, sizeReceive, 0) != sizeReceive) {
-    //         printf("Error when send try send message\n");
-    //     }
-
-    //     if ((sizeReceive = recv(socketClient, buffer, 16, 0)) < 0) {
-    //         printf("Error when try receive responde \n");
-    //     }
-    // }
 
     free(buffer);
 }

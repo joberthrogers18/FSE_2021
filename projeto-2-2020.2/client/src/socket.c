@@ -99,17 +99,6 @@ void sendMessage() {
 
     addInfoFileCsv((float) state.temperature->valuedouble, (float) state.humidity->valuedouble);
 
-	// while(totalBytesReceived < sizeMessage) {
-	// 	if((bytesReceived = recv(clientSocket, buffer, 16-1, 0)) <= 0) {
-	// 		printf("The bytes sended was not receive!\n");
-    //     }
-
-	// 	totalBytesReceived += bytesReceived;
-	// 	buffer[bytesReceived] = '\0';
-		
-    //     printf("%s\n", buffer);
-	// }
-
     free(buffer);
 }
 
