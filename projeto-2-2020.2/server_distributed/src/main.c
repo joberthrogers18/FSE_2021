@@ -71,12 +71,8 @@ int main(int argc, char const *argv[])
     initializeStates();
 
     while (1)
-    {
-        getInformationBME280(&temperatureExternal, &humidity);
-        temperatureExt = (float)temperatureExternal/100;
-        humidityParser = (float)humidity/1000;
-        sleep(1);
-    }
+    {}
+    
 
     return 0;
 }

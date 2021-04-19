@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <cJSON.h>
 #include <gpio.h>
+#include <read_bme280.h>
 
 #define PORT_SERVER 10018
 #define IP_CLIENT "192.168.0.53"
@@ -64,13 +65,13 @@ void turnOFFAllDevices() {
 void handleDeviceState() {
     printf("lamp1: %d; lamp2: %d;lamp3: %d; lamp4: %d\n", state.lamp2->valueint, state.lamp2->valueint, state.lamp3->valueint, state.lamp4->valueint);
     printf("ar1: %d; ar1: %d;\n", state.arCondition1->valueint, state.arCondition2->valueint);
-    printf("sp1: %d; lamp2: %d\n\n", state.sensorPres1->valueint, state.sensorPres2->valueint);
-    // turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
-    // turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
-    // turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
-    // turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, state.lamp4->valueint);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, state.arCondition1->valueint);
-    // turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, state.arCondition2->valueint);
+    printf("sp1: %d; sp2: %d\n\n", state.sensorPres1->valueint, state.sensorPres2->valueint);
+    turnONOrOFFDevice(PIN_LAMP_1_KITCHEN, state.lamp1->valueint);
+    turnONOrOFFDevice(PIN_LAMP_2_ROOM, state.lamp2->valueint);
+    turnONOrOFFDevice(PIN_LAMP_3_BEDROOM_01, state.lamp3->valueint);
+    turnONOrOFFDevice(PIN_LAMP_4_BEDROOM_02, state.lamp4->valueint);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_01, state.arCondition1->valueint);
+    turnONOrOFFDevice(PIN_AR_COND_BEDROOM_02, state.arCondition2->valueint);
 }
 
 void handlerCLientRequest() {

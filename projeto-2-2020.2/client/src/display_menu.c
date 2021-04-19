@@ -116,7 +116,6 @@ void changeState(int code, int currentState) {
 void *menu_handler(void *arg) {
     char value;
     char posfix_code[3];
-    char *code = malloc(4);
 
     while (option != 0) {
         wclear(menu);

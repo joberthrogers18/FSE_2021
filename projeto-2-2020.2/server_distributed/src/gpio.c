@@ -184,6 +184,6 @@ void *printLog(float temperature, float humidity, struct pinState status) {
         state.sensorWindowBedroom1->valueint, 
         state.sensorWindowBedroom2->valueint
     );
-    
-    return;
+
+    return NULL;
 }
