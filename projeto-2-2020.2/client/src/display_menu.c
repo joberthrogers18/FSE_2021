@@ -6,6 +6,7 @@
 #include <display_menu.h>
 #include <socket.h>
 #include <cJSON.h>
+#include <utils.h>
 
 #define LINE_START 1
 #define SCAN_LINE 8
@@ -48,10 +49,14 @@ void *display_states(void *arg) {
         mvwprintw(logs, LINE_START + 5, 5, "Sensor Janela S: %d; Sensor Janela Q1: %d; Sensor Janela Q2: %d", 
             state.sensorWindowRoom->valueint, state.sensorWindowBedroom1->valueint, state.sensorWindowBedroom2->valueint
         );
-        mvwprintw(logs, LINE_START + 6, 5, "Temperatura: %.2lf C°; Umidade: %.2lf %%", 0, 0);
+        mvwprintw(logs, LINE_START + 6, 5, "Temperatura: %.2lf C°; Umidade: %.2lf %%", (float) state.temperature->valuedouble, (float) state.humidity->valuedouble);
 
         attron(A_BOLD);
-        mvwprintw(logs, LINE_START + 7, ((int) xMax / 2) - 3, "ALARME ATIVADO");
+        if (state.sensorWindowRoom->valueint || state.sensorWindowBedroom1->valueint || state.sensorWindowBedroom2->valueint || state.sensorDoorKitchen->valueint || state.sensorWindowKitchen->valueint || state.sensorDoorRoom->valueint || state.sensorPres1->valueint || state.sensorPres2->valueint) {
+            mvwprintw(logs, LINE_START + 7, ((int) xMax / 2) - 3, "ALARME ATIVADO");
+            playBeep();
+        }
+
         wrefresh(logs);
     }
 

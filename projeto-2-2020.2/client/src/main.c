@@ -7,6 +7,7 @@
 #include <socket.h>
 #include <signal.h>
 #include <display_menu.h>
+#include <utils.h>
 
 struct pinState state;
 

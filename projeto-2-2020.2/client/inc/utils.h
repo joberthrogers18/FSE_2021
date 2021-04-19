@@ -3,5 +3,6 @@
 
 void csvCreation();
 void addInfoFileCsv(float temperature, float humidity);
+void playBeep();
 
 #endif

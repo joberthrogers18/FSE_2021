@@ -3,6 +3,10 @@
 #include <utils.h>
 #include <stdlib.h>
 #include <socket.h>
+#include <string.h>
+#include <unistd.h>
+
+char command[1000], cwd[500];
 
 void csvCreation() {
     FILE* csvFile;
@@ -46,4 +50,12 @@ void addInfoFileCsv(float temperature, float humidity) {
     );
 
     fclose(csvFile);
+}
+
+void playBeep() {
+    strcpy(command, "aplay ");
+    getcwd(cwd, sizeof(cwd));
+    strcat(command, cwd);
+    strcat(command, "/src/alarm.mp3 -q");
+    system(command);
 }
