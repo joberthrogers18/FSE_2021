@@ -20,5 +20,6 @@
       "*.md": "markdown",
       "*.mdx": "tdx",
       "stdio.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": true
   }

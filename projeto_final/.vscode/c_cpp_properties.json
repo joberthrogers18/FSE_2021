@@ -1,8 +1,8 @@
 {
     "env": {
         "MESSAGE": " MAC AND LINUX USERS!!!- change path from c:/... to ~/esp/... or as approirate for your enviroment",
-        "IDF_TOOLS": "/home/joberth/.espressif/tools",
-        "IDF_PATH": "/home/joberth/esp/esp-idf"
+        "IDF_TOOLS": "~/.espressif/tools",
+        "IDF_PATH": "~/esp/esp-idf "
     },
     "configurations": [
         {
