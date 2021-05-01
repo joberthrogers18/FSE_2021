@@ -19,7 +19,8 @@
     "files.associations": {
       "*.md": "markdown",
       "*.mdx": "tdx",
-      "stdio.h": "c"
+      "stdio.h": "c",
+      "gpio.h": "c"
     },
     "cmake.configureOnOpen": true
   }

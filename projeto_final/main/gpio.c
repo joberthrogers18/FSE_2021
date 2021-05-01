@@ -9,23 +9,31 @@
 #include "gpio.h"
 
 xQueueHandle filaDeInterrupcao;
+int levelLED = 0;
 
-static void IRAM_ATTR gpio_isr_handler(void *args){
-  printf("Handler botão\n\n");
+// MARK: general functions
+
+void setNivelDispositivo(int dispositivo, int intensidade){
+  gpio_set_level(dispositivo, intensidade);
+}
+
+int getNivelDispositivo(int dispositivo){
+  return gpio_get_level(dispositivo);
+}
+
+// MARK: button functions
+
+void IRAM_ATTR gpio_isr_handler(void *args){
   int pino = (int)args;
   xQueueSendFromISR(filaDeInterrupcao, &pino, NULL);
 }
-
 
 void trataInterrupcaoBotao(void *params){
   int pino;
   int contador = 0;
 
-  printf("Interrupção botão\n\n");
-
   while(true){
     if(xQueueReceive(filaDeInterrupcao, &pino, portMAX_DELAY)){
-      printf("Fila botão\n\n");
       // De-bouncing
       int estado = gpio_get_level(pino);
       if(estado == 1){
@@ -35,7 +43,14 @@ void trataInterrupcaoBotao(void *params){
         }
 
         contador++;
-        printf("O botão foi acionado %d vezes. Botão: %d\n", contador, pino);
+        // Liga/desliga o led a cada clique
+        if(levelLED == 0){
+          setNivelDispositivo(GPIO_NUM_2, 1);
+          levelLED = 1;
+        } else {
+          setNivelDispositivo(GPIO_NUM_2, 0);
+          levelLED = 0;
+        }
 
         // Habilitar novamente a interrupção
         vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -46,36 +61,30 @@ void trataInterrupcaoBotao(void *params){
   }
 }
 
-void ligaLED(int intensidade){
-  gpio_set_level(LED_1, intensidade);
-}
-
-void configuraLed(){
-  printf("Configura LED\n");
-  // Configuração dos pinos dos LEDs 
-  gpio_pad_select_gpio(LED_1);   
-  // Configura os pinos dos LEDs como Output
-  gpio_set_direction(LED_1, GPIO_MODE_OUTPUT);
-}
-
-void configuraBotao(){
-  printf("Configurando botão\n\n");
-
+void configuraBotao(int dispositivo){
   // Configuração do pino do Botão
-  gpio_pad_select_gpio(BOTAO);
+  gpio_pad_select_gpio(dispositivo);
   // Configura o pino do Botão como Entrada
-  gpio_set_direction(BOTAO, GPIO_MODE_INPUT);
+  gpio_set_direction(dispositivo, GPIO_MODE_INPUT);
   // Configura o resistor de Pulldown para o botão (por padrão a entrada estará em Zero)
-  gpio_pulldown_en(BOTAO);
+  gpio_pulldown_en(dispositivo);
   // Desabilita o resistor de Pull-up por segurança.
-  gpio_pullup_dis(BOTAO);
-
-  gpio_set_intr_type(BOTAO, GPIO_INTR_POSEDGE);
+  gpio_pullup_dis(dispositivo);
+  // Configura pino para interrupção
+  gpio_set_intr_type(dispositivo, GPIO_INTR_POSEDGE);
 
   filaDeInterrupcao = xQueueCreate(10, sizeof(int));
   xTaskCreate(trataInterrupcaoBotao, "TrataBotao", 2048, NULL, 1, NULL);
 
   gpio_install_isr_service(0);
-  gpio_isr_handler_add(BOTAO, gpio_isr_handler, (void *) BOTAO);
+  gpio_isr_handler_add(dispositivo, gpio_isr_handler, (void *) dispositivo);
+}
 
+// MARK: led functions
+
+void configuraLed(int dispositivo){
+  // Configuração dos pinos dos LEDs 
+  gpio_pad_select_gpio(dispositivo);   
+  // Configura os pinos dos LEDs como Output
+  gpio_set_direction(dispositivo, GPIO_MODE_OUTPUT);
 }
