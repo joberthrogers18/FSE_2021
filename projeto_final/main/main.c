@@ -1,10 +1,13 @@
 #include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 #include "freertos/queue.h"
+
 #include "dht11.h"
 #include "gpio.h"
+#include "wifi.h"
 
 #define clear() printf("\e[1;1H\e[2J")
 
@@ -20,8 +23,9 @@ void atualizaSensores(void * params){
 }
 
 void app_main(){
-    xTaskCreate(&atualizaSensores, "Leitura de Sensores", 2048, NULL, 2, NULL);
+    configure_wifi();
 
+    xTaskCreate(&atualizaSensores, "Leitura de Sensores", 2048, NULL, 2, NULL);
     configuraLed(LED_1);
     configuraBotao(BOTAO);
 }
