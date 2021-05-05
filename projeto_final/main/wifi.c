@@ -1,4 +1,3 @@
-#include "wifi.h"
 
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -13,10 +12,12 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "wifi.h"
+#include "mqtt.h"
+
 #define WIFI_SSID      CONFIG_ESP_WIFI_SSID
 #define WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
 #define WIFI_MAXIMUM_RETRY  CONFIG_ESP_MAXIMUM_RETRY
-
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 
@@ -26,10 +27,13 @@ static EventGroupHandle_t s_wifi_event_group;
 
 static int s_retry_num = 0;
 xSemaphoreHandle conexaoWifiSemaphore;
+xSemaphoreHandle conexaoMQTTSemaphore;
 
-static void event_handler(void* arg, esp_event_base_t event_base,
-                                int32_t event_id, void* event_data)
-{
+static void event_handler(void* arg, 
+                          esp_event_base_t event_base,
+                          int32_t event_id, 
+                          void* event_data){
+                              
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -88,11 +92,11 @@ void wifi_start(){
     /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
      * happened. */
     if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
-                 WIFI_SSID, WIFI_PASS);
+        ESP_LOGI(TAG, "connected to ap SSID:%s password:%s", WIFI_SSID, WIFI_PASS);
+        conexaoMQTTSemaphore = xSemaphoreCreateBinary();
+        mqtt_start();
     } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
-                 WIFI_SSID, WIFI_PASS);
+        ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", WIFI_SSID, WIFI_PASS);
     } else {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
     }
