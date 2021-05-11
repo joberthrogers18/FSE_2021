@@ -36,29 +36,39 @@ def publish(client):
         msg_count += 1
 
 
-def subscribe(client: mqtt_client):
+def subscribe(client: mqtt_client, current_topic):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
-    client.subscribe(topic)
+    client.subscribe(current_topic)
     client.on_message = on_message
 
 def run_publish(client):
     client.loop_start()
     publish(client)
 
-def run_subscribe(client):
-    subscribe(client)
+def run_subscribe(client, topic):
+    subscribe(client, topic)
     # client.loop_forever()
 
 def run():
+    temperature_ref = "fse2020/160121817/sala/temperatura"
+    humidity_ref = "fse2020/160121817/sala/umidade"
+    status_ref = "fse2020/160121817/sala/status"
+
     client_int = connect_mqtt()
-    sub = threading.Thread(target=run_subscribe, args=(client_int,))
+    sub = threading.Thread(target=run_subscribe, args=(client_int, temperature_ref))
     sub.start()
+    sub_2 = threading.Thread(target=run_subscribe, args=(client_int, humidity_ref))
+    sub_2.start()
+    sub_3 = threading.Thread(target=run_subscribe, args=(client_int, status_ref))
+    sub_3.start()
     pub = threading.Thread(target=run_publish, args=(client_int,))
     pub.start()
-    # pub.join()
-    # sub.join()
+    pub.join()
+    sub.join()
+    sub_2.join()
+    sub_3.join()
 
 if __name__ == '__main__':
     run()

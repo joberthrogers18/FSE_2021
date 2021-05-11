@@ -1,1 +1,4 @@
 paho-mqtt
+Flask
+flask-cors
+flask-socketio
