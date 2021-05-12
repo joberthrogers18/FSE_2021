@@ -35,11 +35,11 @@ void register_esp(){
     char mac_address[19]; 
 
     esp_efuse_mac_get_default(mac);
-    sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x\n",
+    sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x",
         mac[0] & 0xff, mac[1] & 0xff, mac[2] & 0xff,
         mac[3] & 0xff, mac[4] & 0xff, mac[5] & 0xff);
 
-    ESP_LOGI(TAG, "MAC ADDRESS: %s", mac_address);
+    ESP_LOGI(TAG, "MAC ADDRESS: [%s]", mac_address);
 
     char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
     sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
