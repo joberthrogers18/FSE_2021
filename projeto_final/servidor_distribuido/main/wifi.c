@@ -1,5 +1,5 @@
-
 #include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -29,6 +29,28 @@ static int s_retry_num = 0;
 xSemaphoreHandle conexaoWifiSemaphore;
 xSemaphoreHandle conexaoMQTTSemaphore;
 
+void register_esp(){
+
+    uint8_t mac[6]; 
+    char mac_address[19]; 
+
+    esp_efuse_mac_get_default(mac);
+    sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x\n",
+        mac[0] & 0xff, mac[1] & 0xff, mac[2] & 0xff,
+        mac[3] & 0xff, mac[4] & 0xff, mac[5] & 0xff);
+
+    ESP_LOGI(TAG, "MAC ADDRESS: %s", mac_address);
+
+    char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
+    sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
+
+    ESP_LOGI(TAG, "Topico: [%s]", topico);
+
+    mqtt_start();
+    mqtt_envia_mensagem(topico, "testando");
+
+}
+
 static void event_handler(void* arg, 
                           esp_event_base_t event_base,
                           int32_t event_id, 
@@ -36,11 +58,6 @@ static void event_handler(void* arg,
                               
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
-
-        wifi_event_sta_connected_t *event = (wifi_event_sta_connected_t*) event_data;
-        ESP_LOGI(TAG, "MAC ADDRESS: %s \n", (char *) &event->bssid);
-
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         if (s_retry_num < WIFI_MAXIMUM_RETRY) {
             esp_wifi_connect();
@@ -99,7 +116,7 @@ void wifi_start(){
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "connected to ap SSID:%s password:%s", WIFI_SSID, WIFI_PASS);
         conexaoMQTTSemaphore = xSemaphoreCreateBinary();
-        mqtt_start();
+        register_esp();
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", WIFI_SSID, WIFI_PASS);
     } else {
