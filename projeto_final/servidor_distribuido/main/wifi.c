@@ -36,6 +36,11 @@ static void event_handler(void* arg,
                               
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
+    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
+
+        wifi_event_sta_connected_t *event = (wifi_event_sta_connected_t*) event_data;
+        ESP_LOGI(TAG, "MAC ADDRESS: %s \n", (char *) &event->bssid);
+
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         if (s_retry_num < WIFI_MAXIMUM_RETRY) {
             esp_wifi_connect();
