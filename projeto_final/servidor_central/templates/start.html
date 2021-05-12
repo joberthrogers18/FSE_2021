@@ -1,1 +1,50 @@
-<h1>Teste</h1>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block head %}
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <meta charset="UTF-8">
+            <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+            <!-- <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}"> -->
+            <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+            <title>Esp32</title>
+            {% endblock %}
+        </head>
+        <body>
+            <div class="main-content">{% block content %}{% endblock %}</div>
+            <h1>Esp32</h1>
+            <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
+            <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+        <script type="text/javascript" charset="utf-8">
+
+            var socket = io();                  
+
+            // var socket = io(
+                // {
+                //     reconnection: true,
+                //     reconnectionAttempts: Infinity,
+                //     reconnectionDelay: 1000,
+                //     reconnectionDelayMax: 1500,
+                //     timeout: 1500,
+                //     transports : ['polling']
+                // }
+            // );
+
+            socket.on('connect', () => {
+                console.log('Conectado!');
+            });
+
+            socket.on("fse2020/160121817/sala/temperatura", function(msg) {
+                var umidadeSpan = document.getElementById("temperatura");
+                umidadeSpan.textContent = msg["temperatura"] + "C°";
+            });
+
+            socket.on("fse2020/160121817/sala/umidade", function(msg) {
+                var umidadeSpan = document.getElementById("umidade");
+                umidadeSpan.textContent = msg["umidade"] + "%";
+            });
+        </script>
+    </body>
+</html>

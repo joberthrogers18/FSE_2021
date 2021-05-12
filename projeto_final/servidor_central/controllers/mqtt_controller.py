@@ -34,16 +34,23 @@ class MqttController:
             result = client.publish(topic, msg)
             # result: [0, 1]
             status = result[0]
-            if status == 0:
-                print(f"Send `{msg}` to topic `{topic}`")
-            else:
-                print(f"Failed to send message to topic {topic}")
+            # if status == 0:
+            #     print(f"Send `{msg}` to topic `{topic}`")
+            # else:
+            #     print(f"Failed to send message to topic {topic}")
             msg_count += 1
 
 
     def subscribe(self, client: mqtt_client, current_topic):
         def on_message(client, userdata, msg):
-            print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+            print(current_topic)
+            self.socketio.emit(
+                str(current_topic),
+                {
+                    current_topic: msg.payload.decode()
+                }
+            )
+            # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
         client.subscribe(current_topic)
         client.on_message = on_message
@@ -52,9 +59,19 @@ class MqttController:
         client.loop_start()
         self.publish(client)
 
-    def run_subscribe(self, client, topic):
-        self.subscribe(client, topic)
-        # client.loop_forever()
+    def run_subscribe(self, client, current_topic):
+        def on_message(client, userdata, msg):
+            name_topic = str(msg.topic).split("/")[-1]
+            self.socketio.emit(
+                str(msg.topic),
+                {
+                    name_topic: msg.payload.decode("utf-8")
+                }
+            )
+            # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+
+        client.subscribe(current_topic)
+        client.on_message = on_message
 
     def run(self):
         temperature_ref = "fse2020/160121817/sala/temperatura"
@@ -62,15 +79,15 @@ class MqttController:
         status_ref = "fse2020/160121817/sala/status"
 
         client_int = self.connect_mqtt()
-        sub = threading.Thread(target=self.run_subscribe, args=(client_int, temperature_ref))
+        sub = threading.Thread(target=self.run_subscribe, args=(client_int, temperature_ref,))
         sub.start()
-        sub_2 = threading.Thread(target=self.run_subscribe, args=(client_int, humidity_ref))
+        sub_2 = threading.Thread(target=self.run_subscribe, args=(client_int, humidity_ref,))
         sub_2.start()
-        sub_3 = threading.Thread(target=self.run_subscribe, args=(client_int, status_ref))
-        sub_3.start()
+        # sub_3 = threading.Thread(target=self.run_subscribe, args=(client_int, status_ref,))
+        # sub_3.start()
         pub = threading.Thread(target=self.run_publish, args=(client_int,))
         pub.start()
         pub.join()
         sub.join()
         sub_2.join()
-        sub_3.join()
+        # sub_3.join()
