@@ -44,12 +44,12 @@ class MqttController:
     def subscribe(self, client: mqtt_client, current_topic):
         def on_message(client, userdata, msg):
             print(current_topic)
-            self.socketio.emit(
-                str(current_topic),
-                {
-                    current_topic: msg.payload.decode()
-                }
-            )
+            # self.socketio.emit(
+            #     str(current_topic),
+            #     {
+            #         current_topic: msg.payload.decode()
+            #     }
+            # )
             # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
         client.subscribe(current_topic)
@@ -62,13 +62,13 @@ class MqttController:
     def run_subscribe(self, client, current_topic):
         def on_message(client, userdata, msg):
             name_topic = str(msg.topic).split("/")[-1]
-            self.socketio.emit(
-                str(msg.topic),
-                {
-                    name_topic: msg.payload.decode("utf-8")
-                }
-            )
-            # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+            # self.socketio.emit(
+            #     str(msg.topic),
+            #     {
+            #         name_topic: msg.payload.decode("utf-8")
+            #     }
+            # )
+            print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
         client.subscribe(current_topic)
         client.on_message = on_message
@@ -77,17 +77,21 @@ class MqttController:
         temperature_ref = "fse2020/160121817/sala/temperatura"
         humidity_ref = "fse2020/160121817/sala/umidade"
         status_ref = "fse2020/160121817/sala/status"
+        topic_device = "fse2020/160121817/dispositivos/+"
 
         client_int = self.connect_mqtt()
-        sub = threading.Thread(target=self.run_subscribe, args=(client_int, temperature_ref,))
-        sub.start()
-        sub_2 = threading.Thread(target=self.run_subscribe, args=(client_int, humidity_ref,))
-        sub_2.start()
+        devices = threading.Thread(target=self.run_subscribe, args=(client_int, topic_device))
+        devices.start()
+        devices.join()
+        # sub = threading.Thread(target=self.run_subscribe, args=(client_int, temperature_ref,))
+        # sub.start()
+        # sub_2 = threading.Thread(target=self.run_subscribe, args=(client_int, humidity_ref,))
+        # sub_2.start()
         # sub_3 = threading.Thread(target=self.run_subscribe, args=(client_int, status_ref,))
         # sub_3.start()
         pub = threading.Thread(target=self.run_publish, args=(client_int,))
         pub.start()
         pub.join()
-        sub.join()
-        sub_2.join()
+        # sub.join()
+        # sub_2.join()
         # sub_3.join()

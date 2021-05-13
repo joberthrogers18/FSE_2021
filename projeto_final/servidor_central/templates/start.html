@@ -5,21 +5,153 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
             <meta charset="UTF-8">
             <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-            <!-- <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}"> -->
+            <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
             <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
             <title>Esp32</title>
             {% endblock %}
         </head>
         <body>
-            <div class="main-content">{% block content %}{% endblock %}</div>
-            <h1>Esp32</h1>
-            <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
-            <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
-
+            <!-- <div class="main-content">{% block content %}{% endblock %}</div> -->
+            <div class="main-content">
+                <div class="list-registered">
+                    <div class="device-register">
+                        <div class="device-info">
+                            <span class="name-title">Comodo 1</span>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span>
+                            </div>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="btn-trash">
+                                <span>Excluir</span>
+                                <i style="color: #FFF;"  class="fas fa-trash"></i>
+                            </div>
+                            <div class="btn-led">
+                                <span>Ligar LED</span>
+                                <i style="color: #FFF;"  class="fas fa-power-off"></i>
+                            </div>
+                        </div>                   
+                    </div>
+                    <div class="device-register">
+                        <div class="device-info">
+                            <span class="name-title">Comodo 2</span>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
+                            </div>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="btn-trash">
+                                <span>Excluir</span>
+                                <i style="color: #FFF;"  class="fas fa-trash"></i>
+                            </div>
+                            <div class="btn-led">
+                                <span>Ligar LED</span>
+                                <i style="color: #FFF;"  class="fas fa-power-off"></i>
+                            </div>
+                        </div>                    
+                    </div>
+                    <div class="device-register">                    
+                        <div class="device-info">
+                            <span class="name-title">Comodo 3</span>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
+                            </div>
+                            <div class="measure">
+                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="btn-trash">
+                                <span>Excluir</span>
+                                <i style="color: #FFF;" class="fas fa-trash"></i>
+                            </div>
+                            <div class="btn-led">
+                                <span>Ligar LED</span>
+                                <i style="color: #FFF;" class="fas fa-power-off"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-unregistered">
+                    <span class="title-unregister-device">Dispositivos Não Registrados</span>
+                    <div class="list-devices">
+                        <div class="device-unregistered">
+                            <div>
+                                <span class="label-device">Dispositivo: </span>
+                                <span class="label-device">1531321:</span>
+                            </div>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="device-unregistered">
+                            <div>
+                                <span class="label-device">Dispositivo: </span>
+                                <span class="label-device">1531321</span>
+                            </div>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="device-unregistered">
+                            <div>
+                                <span class="label-device">Dispositivo: </span>
+                                <span class="label-device">1531321</span>
+                            </div>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Cadastrar Novo Dispositivo</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                  <label for="name-comodo">Nome do Cômodo</label>
+                                  <input type="text" class="form-control" id="name-comodo" aria-describedby="emailHelp" placeholder="Digite o nome do cômodo">
+                                </div>
+                                <div class="form-group">
+                                  <label for="name-input">Nome para Entrada</label>
+                                  <input type="text" class="form-control" id="name-input" placeholder="Digite o nome para a entrada">
+                                </div>
+                                <div class="form-group">
+                                    <label for="name-output">Nome para Saída</label>
+                                    <input type="text" class="form-control" id="name-output" placeholder="Digite o nome para a saida">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Enviar</button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf-8">
 
-            var socket = io();                  
+            // var socket = io();                  
 
             // var socket = io(
                 // {
@@ -32,19 +164,19 @@
                 // }
             // );
 
-            socket.on('connect', () => {
-                console.log('Conectado!');
-            });
+            // socket.on('connect', () => {
+            //     console.log('Conectado!');
+            // });
 
-            socket.on("fse2020/160121817/sala/temperatura", function(msg) {
-                var umidadeSpan = document.getElementById("temperatura");
-                umidadeSpan.textContent = msg["temperatura"] + "C°";
-            });
+            // socket.on("fse2020/160121817/sala/temperatura", function(msg) {
+            //     var umidadeSpan = document.getElementById("temperatura");
+            //     umidadeSpan.textContent = msg["temperatura"] + "C°";
+            // });
 
-            socket.on("fse2020/160121817/sala/umidade", function(msg) {
-                var umidadeSpan = document.getElementById("umidade");
-                umidadeSpan.textContent = msg["umidade"] + "%";
-            });
+            // socket.on("fse2020/160121817/sala/umidade", function(msg) {
+            //     var umidadeSpan = document.getElementById("umidade");
+            //     umidadeSpan.textContent = msg["umidade"] + "%";
+            // });
         </script>
     </body>
 </html>

@@ -1,0 +1,123 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+}
+
+.main-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+}
+
+.main-content .list-registered {
+    width: 70%;
+    height: 100%;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-column-gap: 20px;
+}
+
+.device-register {
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px #888;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.device-register .actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.device-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.name-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.measure {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.actions .btn-trash {
+    width: 120px;
+    border-radius: 7px;
+    background-color: #b20000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 2px;
+    cursor: pointer;
+}
+
+.actions .btn-led {
+    width: 120px;
+    border-radius: 7px;
+    background-color: #0066cc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 2px;
+    cursor: pointer;
+}
+
+.actions span {
+    color: #FFFFFF;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.main-content .list-unregistered {
+    margin-left: 10px;
+    border-radius: 10px;
+    width: 30%;
+    height: 100%;
+    border: 1px solid #333;
+    padding: 10px;
+}
+
+.title-unregister-device {
+    font-size: 21px;
+    font-weight: bold;
+    overflow: auto;
+}
+
+.list-devices {
+    margin-top: 15px;
+    height: 95%;
+}
+
+.device-unregistered {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.device-unregistered:hover {
+    background-color: #DED;
+}
