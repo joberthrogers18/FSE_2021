@@ -22,18 +22,44 @@
 
 #define TAG "MQTT"
 
+char * device_topic;
+
+void register_esp(){
+  uint8_t mac[6]; 
+  char mac_address[19]; 
+
+  esp_efuse_mac_get_default(mac);
+  sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x",
+          mac[0] & 0xff, mac[1] & 0xff, mac[2] & 0xff,
+          mac[3] & 0xff, mac[4] & 0xff, mac[5] & 0xff);
+
+  ESP_LOGI(TAG, "MAC ADDRESS: [%s]", mac_address);
+
+  char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
+  sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
+
+  ESP_LOGI(TAG, "Topico: [%s]", topico);
+
+  mqtt_start();
+  mqtt_envia_mensagem(topico, "testando");
+  sleep(2);
+  mqtt_assinar_canal(topico);
+}
+
 extern xSemaphoreHandle conexaoMQTTSemaphore;
 esp_mqtt_client_handle_t client;
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
   esp_mqtt_client_handle_t client = event->client;
   int msg_id;
+
+  char message[event->data_len];
+  char topic[event->topic_len];
   
   switch (event->event_id) {
     case MQTT_EVENT_CONNECTED:
       ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
       xSemaphoreGive(conexaoMQTTSemaphore);
-      msg_id = esp_mqtt_client_subscribe(client, "servidor/resposta", 0);
       break;
     case MQTT_EVENT_DISCONNECTED:
       ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -49,8 +75,14 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
       break;
     case MQTT_EVENT_DATA:
       ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-      printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-      printf("DATA=%.*s\r\n", event->data_len, event->data);
+      memcpy(message, event->data, event->data_len);
+      memcpy(topic, event->topic, event->topic_len);
+      message[event->data_len] = '\0';
+
+      if(strcmp(topic, device_topic)){
+        printf("MENSAGEM NO CANAL DO DISPOSITIVO: %s\n", message);
+      }
+
       break;
     case MQTT_EVENT_ERROR:
       ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -79,4 +111,9 @@ void mqtt_start(){
 void mqtt_envia_mensagem(char * topico, char * mensagem){
   int message_id = esp_mqtt_client_publish(client, topico, mensagem, 0, 1, 0);
   ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
+}
+
+void mqtt_assinar_canal(char * topico){
+  int id_msg_device = esp_mqtt_client_subscribe(client, topico, 0);
+  device_topic = topico;
 }

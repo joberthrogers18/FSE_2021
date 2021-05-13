@@ -12,13 +12,14 @@
 #include "gpio.h"
 #include "mqtt.h"
 #include "wifi.h"
+#include "nvs.h"
 
 #define TAG "Main"
 #define FLOAT_SIZE_MAX 318
 
 #define clear() printf("\e[1;1H\e[2J")
 
-void atualizaSensores(void * params){
+void atualiza_dados_sensores(void * params){
     DHT11_init(GPIO_NUM_4);
     while(1) {
         if(DHT11_read().status >= 0){
@@ -52,7 +53,7 @@ void app_main(){
     // se a conexão funcionar, inicia a conexão MQTT
     configure_wifi();
 
-    xTaskCreate(&atualizaSensores, "Leitura de Sensores", 2048, NULL, 2, NULL);
+    xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, NULL, 2, NULL);
     configuraLed(LED_1);
     configuraBotao(BOTAO);
 }
