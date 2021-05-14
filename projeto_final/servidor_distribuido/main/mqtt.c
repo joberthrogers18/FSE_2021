@@ -21,11 +21,13 @@
 #include "mqtt.h"
 #include "nvs.h"
 #include "cJSON.h"
+#include "sensor.h"
 
 #define TAG "MQTT"
 
 char * device_topic;
 uint8_t mac[6];
+char comodo[COMODO_MAX_LENGTH_NAME] = {0};
 
 void register_esp(){
   char mac_address[19];
@@ -87,20 +89,22 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
         char smac[6];
         sprintf(smac, "%hhn", mac);
 
-        if(le_valor_nvs(smac) == -2){
+        if(le_valor_nvs(smac, comodo) == -2){
           ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
           // CADASTRA DISPOSITIVO NVS
-          char comodo[20] = {0};
-          cJSON *jsonResponse = cJSON_Parse(message);
-          strcpy(comodo, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
-          ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo);
+          char comodo_json[COMODO_MAX_LENGTH_NAME] = {0};
 
-          grava_valor_nvs(smac, comodo);
+          cJSON *jsonResponse = cJSON_Parse(message);
+          strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
+          ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo_json);
+          
+          grava_valor_nvs(smac, comodo_json);
+          xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo_json, 2, NULL);
           // FIM
         } else {
           ESP_LOGI(TAG, "ESP CADASTRADA");
+          xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo, 2, NULL);
         }
-
       }
 
       break;

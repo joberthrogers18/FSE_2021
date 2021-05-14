@@ -11,7 +11,7 @@
 
 #define TAG "NVS"
 
-int32_t le_valor_nvs(char* name){
+int32_t le_valor_nvs(char* name, char* src){
   // Inicia o acesso à partição padrão nvs
   ESP_ERROR_CHECK(nvs_flash_init());
 
@@ -31,6 +31,7 @@ int32_t le_valor_nvs(char* name){
     switch (res){
       case ESP_OK:
         printf("Valor armazenado: %s\n", valor);
+        strcpy(src, valor);
         break;
       case ESP_ERR_NOT_FOUND:
         ESP_LOGE(TAG, "Valor não encontrado");
