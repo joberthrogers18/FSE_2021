@@ -14,6 +14,7 @@
         </head>
         <body>
             <!-- <div class="main-content">{% block content %}{% endblock %}</div> -->
+            <button onclick="newCommoditieRegister()">teste</button>
             <div class="main-content">
                 <div class="list-registered">
                     <div class="device-register">
@@ -150,6 +151,117 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf-8">
+
+            function newDeviceRegiste() {
+                var listUnregistered = document.querySelector(".list-devices");
+                
+                var deviceUnregistered = document.createElement("div");
+                deviceUnregistered.className = "device-unregistered";
+                
+                var divInfo = document.createElement("div");
+                
+                var spanLabel = document.createElement("span");
+                spanLabel.innerText = "Dispositivo:";
+
+                var device = document.createElement("span");
+                device.innerText = "153151315";
+                
+                var icon = document.createElement("i");
+                icon.className = "fas fa-plus";
+
+                var button = document.createElement("button");
+                button.setAttribute("type", "button");
+                button.setAttribute("data-toggle", "modal");
+                button.setAttribute("data-target", "#exampleModal");
+                button.className = "btn btn-primary";
+                button.appendChild(icon);
+                
+                divInfo.appendChild(spanLabel);
+                divInfo.appendChild(device);
+                deviceUnregistered.appendChild(divInfo);
+                deviceUnregistered.appendChild(button);
+                listUnregistered.appendChild(deviceUnregistered);
+            }
+
+            function newCommoditieRegister() {
+                var listRegistered = document.querySelector(".list-registered");
+
+                var deviceRegistered = document.createElement("div");
+                deviceRegistered.className = "device-register";
+
+                var deviceInfo = document.createElement("div");
+                deviceInfo.className = "name-title";
+
+                var nameTitle = document.createElement("span");
+                nameTitle.className = "name-title";
+                nameTitle.innerText = "Comodo";
+
+                var measureTemperature = document.createElement("div"); 
+                measureTemperature.className = "measure";
+
+                var temperatureLabel = document.createElement("span");
+                temperatureLabel.style.fontWeight = "bold";
+                temperatureLabel.innerText = "Temperatura: ";
+
+                var temperature = document.createElement("span");
+                temperature.innerText = "?";
+
+                measureTemperature.appendChild(temperatureLabel);
+                measureTemperature.appendChild(temperature);
+
+                var measureHumidity = document.createElement("div"); 
+                measureHumidity.className = "measure";
+
+                var HumidityLabel = document.createElement("span");
+                HumidityLabel.style.fontWeight = "bold";
+                HumidityLabel.innerText = "Umidade: ";
+
+                var humidity = document.createElement("span");
+                humidity.innerText = "?";
+
+                var actions = document.createElement("div");
+                actions.classList = "actions";
+
+                var btnTrash = document.createElement("div");
+                btnTrash.classList = "btn-trash";
+                
+                btnLabelTrash = document.createElement("span");
+                btnLabelTrash.innerText = "Excluir";
+
+                var iconTrash = document.createElement("i");
+                iconTrash.className = "fas fa-trash";
+                iconTrash.style.color = "#fff";
+
+                btnTrash.appendChild(btnLabelTrash);
+                btnTrash.appendChild(iconTrash);
+
+                var btnLed = document.createElement("div");
+                btnLed.classList = "btn-led";
+
+                btnLabelLed= document.createElement("span");
+                btnLabelLed.innerText = "Excluir";
+
+                var iconLed = document.createElement("i");
+                iconLed.className = "fas fa-power-off";
+                iconLed.style.color = "#fff";
+
+                btnLed.appendChild(btnLabelLed);
+                btnLed.appendChild(iconLed);
+
+                actions.appendChild(btnTrash);
+                actions.appendChild(btnLed);
+
+                measureHumidity.appendChild(HumidityLabel);
+                measureHumidity.appendChild(humidity);
+
+                deviceInfo.appendChild(nameTitle);
+                deviceInfo.appendChild(measureTemperature);
+                deviceInfo.appendChild(measureHumidity);
+
+                deviceRegistered.appendChild(deviceInfo);
+                deviceRegistered.appendChild(actions);
+                listRegistered.appendChild(deviceRegistered);
+            }
 
             // var socket = io();                  
 
