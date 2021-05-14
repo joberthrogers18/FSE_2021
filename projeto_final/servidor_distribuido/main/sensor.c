@@ -10,6 +10,7 @@
 #include "mqtt.h"
 #include "dht11.h"
 #include "sensor.h"
+#include "cJSON.h"
 
 #define TAG "SENSOR"
 
@@ -22,13 +23,17 @@ void atualiza_dados_sensores(void* comodo){
     DHT11_init(GPIO_NUM_4);
     while(1) {
         if(DHT11_read().status >= 0){
-            char temperatura[sizeof(DHT11_read().temperature)];
-            char umidade[sizeof(DHT11_read().humidity)];
-            char statusCode[sizeof(DHT11_read().status)];
+            cJSON *dataTemp = cJSON_CreateObject();
+            cJSON_AddItemToObject(dataTemp, "data", cJSON_CreateNumber(DHT11_read().temperature));
+            char *temperatura = cJSON_Print(dataTemp);
 
-            sprintf(temperatura, "%d", DHT11_read().temperature);
-            sprintf(umidade, "%d", DHT11_read().humidity);
-            sprintf(statusCode, "%d", DHT11_read().status);
+            cJSON *dataUmi = cJSON_CreateObject();
+            cJSON_AddItemToObject(dataUmi, "data", cJSON_CreateNumber(DHT11_read().humidity));
+            char *umidade = cJSON_Print(dataUmi);
+
+            cJSON *dataStt = cJSON_CreateObject();
+            cJSON_AddItemToObject(dataStt, "data", cJSON_CreateNumber(DHT11_read().status));
+            char *statusCode = cJSON_Print(dataStt);
 
             char topic_temp[MAX_SIZE_TOPIC_LENGTH] = {0};
             char topic_umi[MAX_SIZE_TOPIC_LENGTH] = {0};
