@@ -20,6 +20,7 @@
 
 #include "mqtt.h"
 #include "nvs.h"
+#include "cJSON.h"
 
 #define TAG "MQTT"
 
@@ -44,7 +45,7 @@ void register_esp(){
   mqtt_start();
   mqtt_envia_mensagem(topico, "testando");
   sleep(2);
-  mqtt_assinar_canal(topico);
+  mqtt_assinar_canal(ROOM_PATH);
 }
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
@@ -81,7 +82,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
       message[event->data_len] = '\0';
 
       if(strcmp(topic, device_topic)){
-        printf("MENSAGEM NO CANAL DO DISPOSITIVO: %s\n", message);
+        ESP_LOGI(TAG, "CÔMODO: %s\n", message);
 
         char smac[6];
         sprintf(smac, "%hhn", mac);
@@ -89,7 +90,13 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
         if(le_valor_nvs(smac) == -2){
           ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
           // CADASTRA DISPOSITIVO NVS
-          grava_valor_nvs(smac, message);
+          char comodo[20] = {0};
+          cJSON *jsonResponse = cJSON_Parse(message);
+          strcpy(comodo, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
+          ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo);
+
+          grava_valor_nvs(smac, comodo);
+          // FIM
         } else {
           ESP_LOGI(TAG, "ESP CADASTRADA");
         }

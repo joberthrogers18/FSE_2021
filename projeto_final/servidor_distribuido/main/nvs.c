@@ -19,7 +19,7 @@ int32_t le_valor_nvs(char* name){
   nvs_handle particao_padrao_handle;
   
   // Abre o acesso à partição nvs
-  esp_err_t res_nvs = nvs_open("armazenamento", NVS_READONLY, &particao_padrao_handle);
+  esp_err_t res_nvs = nvs_open("armazenamento", NVS_READWRITE, &particao_padrao_handle);
   
   if(res_nvs == ESP_ERR_NVS_NOT_FOUND){
     ESP_LOGE(TAG, "Namespace: não encontrado");

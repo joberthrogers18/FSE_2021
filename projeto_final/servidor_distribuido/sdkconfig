@@ -127,6 +127,14 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
+# Configuração do Wifi Configuration
+#
+CONFIG_ESP_WIFI_SSID="CLARO_2G01AFE4"
+CONFIG_ESP_WIFI_PASSWORD="3801AFE4"
+CONFIG_ESP_MAXIMUM_RETRY=5
+# end of Configuração do Wifi Configuration
+
+#
 # Compiler options
 #
 CONFIG_COMPILER_OPTIMIZATION_DEFAULT=y
