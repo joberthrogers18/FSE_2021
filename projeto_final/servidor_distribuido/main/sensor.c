@@ -13,11 +13,11 @@
 
 #define TAG "SENSOR"
 
-void atualiza_dados_sensores(void * comodo){
+void atualiza_dados_sensores(void* comodo){
     char comodo_s[COMODO_MAX_LENGTH_NAME] = {0};
     memcpy(comodo_s, comodo, COMODO_MAX_LENGTH_NAME);
 
-    ESP_LOGI(TAG, "CÔMODO: %s", comodo_s);
+    ESP_LOGI(TAG, "CÔMODO: [%s]", comodo_s);
 
     DHT11_init(GPIO_NUM_4);
     while(1) {
@@ -51,9 +51,8 @@ void atualiza_dados_sensores(void * comodo){
             mqtt_envia_mensagem(topic_stt, statusCode);
 
         } else {
-            ESP_LOGI(TAG, "Erro ao recuperar temperatura");
+            ESP_LOGE(TAG, "Erro ao recuperar dados dos sensores");
         }
-        // clear();
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

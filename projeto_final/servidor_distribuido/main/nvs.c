@@ -30,7 +30,7 @@ int32_t le_valor_nvs(char* name, char* src){
 
     switch (res){
       case ESP_OK:
-        printf("Valor armazenado: %s\n", valor);
+        ESP_LOGI(TAG, "Valor armazenado: [%s]", valor);
         strcpy(src, valor);
         break;
       case ESP_ERR_NOT_FOUND:

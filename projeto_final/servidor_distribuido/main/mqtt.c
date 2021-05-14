@@ -26,11 +26,14 @@
 #define TAG "MQTT"
 
 char * device_topic;
-uint8_t mac[6];
-char comodo[COMODO_MAX_LENGTH_NAME] = {0};
+int esp_cadastrada;
+char smac[6];
 
 void register_esp(){
+  // obtem MAC ADDRESS
   char mac_address[19];
+  uint8_t mac[6];
+  char comodo[COMODO_MAX_LENGTH_NAME] = {0};
 
   esp_efuse_mac_get_default(mac);
   sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x",
@@ -38,16 +41,27 @@ void register_esp(){
           mac[3] & 0xff, mac[4] & 0xff, mac[5] & 0xff);
 
   ESP_LOGI(TAG, "MAC ADDRESS: [%s]", mac_address);
+  sprintf(smac, "%hhn", mac);
 
-  char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
-  sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
+  // verifica se a esp já está registrada na memória
+  if(le_valor_nvs(smac, comodo) == -2){
+    ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
+    // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
 
-  ESP_LOGI(TAG, "Topico: [%s]", topico);
+    char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
+    sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
+    
+    ESP_LOGI(TAG, "Topico: [%s]", topico);
 
-  mqtt_start();
-  mqtt_envia_mensagem(topico, "testando");
-  sleep(2);
-  mqtt_assinar_canal(ROOM_PATH);
+    mqtt_envia_mensagem(topico, "Cadastro ESP");
+    sleep(2);
+    mqtt_assinar_canal(ROOM_PATH);
+
+  } else {
+    ESP_LOGI(TAG, "ESP CADASTRADA");
+    ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo);
+    xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo, 2, NULL);
+  }
 }
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
@@ -86,25 +100,14 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
       if(strcmp(topic, device_topic)){
         ESP_LOGI(TAG, "CÔMODO: %s\n", message);
 
-        char smac[6];
-        sprintf(smac, "%hhn", mac);
+        // CADASTRA DISPOSITIVO NVS
+        char comodo_json[COMODO_MAX_LENGTH_NAME] = {0};
 
-        if(le_valor_nvs(smac, comodo) == -2){
-          ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
-          // CADASTRA DISPOSITIVO NVS
-          char comodo_json[COMODO_MAX_LENGTH_NAME] = {0};
-
-          cJSON *jsonResponse = cJSON_Parse(message);
-          strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
-          ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo_json);
-          
-          grava_valor_nvs(smac, comodo_json);
-          xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo_json, 2, NULL);
-          // FIM
-        } else {
-          ESP_LOGI(TAG, "ESP CADASTRADA");
-          xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo, 2, NULL);
-        }
+        cJSON *jsonResponse = cJSON_Parse(message);
+        strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
+        
+        grava_valor_nvs(smac, comodo_json);
+        xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo_json, 2, NULL);
       }
 
       break;
@@ -132,12 +135,12 @@ void mqtt_start(){
   esp_mqtt_client_start(client);
 }
 
-void mqtt_envia_mensagem(char * topico, char * mensagem){
+void mqtt_envia_mensagem(char* topico, char* mensagem){
   int message_id = esp_mqtt_client_publish(client, topico, mensagem, 0, 1, 0);
   ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
 }
 
-void mqtt_assinar_canal(char * topico){
+void mqtt_assinar_canal(char* topico){
   int id_msg_device = esp_mqtt_client_subscribe(client, topico, 0);
   device_topic = topico;
 }
