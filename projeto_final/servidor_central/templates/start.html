@@ -13,8 +13,6 @@
             {% endblock %}
         </head>
         <body>
-            <!-- <div class="main-content">{% block content %}{% endblock %}</div> -->
-            <button onclick="newCommoditieRegister()">teste</button>
             <div class="main-content">
                 <div class="list-registered">
                     <div class="device-register">
@@ -139,8 +137,8 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Enviar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button onclick="RegisterDevice()" type="button" class="btn btn-primary">Enviar</button>
                         </div>
                         </div>
                     </div>
@@ -152,7 +150,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf-8">
 
-            function newDeviceRegiste() {
+            var idDeviceToRegister = null;
+
+            function newDeviceRegiste(idDevice) {
                 var listUnregistered = document.querySelector(".list-devices");
                 
                 var deviceUnregistered = document.createElement("div");
@@ -164,7 +164,7 @@
                 spanLabel.innerText = "Dispositivo:";
 
                 var device = document.createElement("span");
-                device.innerText = "153151315";
+                device.innerText = String(idDevice);
                 
                 var icon = document.createElement("i");
                 icon.className = "fas fa-plus";
@@ -172,8 +172,12 @@
                 var button = document.createElement("button");
                 button.setAttribute("type", "button");
                 button.setAttribute("data-toggle", "modal");
+                button.setAttribute("id", String(idDevice));
                 button.setAttribute("data-target", "#exampleModal");
                 button.className = "btn btn-primary";
+                button.addEventListener('click', function(){ 
+                    idDeviceToRegister = idDevice;
+                }, false);
                 button.appendChild(icon);
                 
                 divInfo.appendChild(spanLabel);
@@ -261,6 +265,14 @@
                 deviceRegistered.appendChild(deviceInfo);
                 deviceRegistered.appendChild(actions);
                 listRegistered.appendChild(deviceRegistered);
+            }
+
+            function RegisterDevice() {
+                var commoditie = document.getElementById("name-comodo").value;
+                var input = document.getElementById("name-input").value;
+                var output = document.getElementById("name-output").value;
+                
+                console.log(commoditie, input, output, idDeviceToRegister);
             }
 
             // var socket = io();                  
