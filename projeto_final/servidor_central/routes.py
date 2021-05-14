@@ -18,3 +18,7 @@ class Route:
         @self.app.route('/')
         def main_route():
             return render_template('start.html')
+        
+        @self.socketio.on('publish_channel')
+        def on_publish_device(data):
+            self.mqtt.publish_message(data)

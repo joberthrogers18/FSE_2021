@@ -2,6 +2,7 @@ import random
 import time
 import threading
 from paho.mqtt import client as mqtt_client
+import json
 
 broker = 'test.mosquitto.org'
 port = 1883
@@ -14,6 +15,7 @@ class MqttController:
         self.app = app
         self.unregisteredDevices = []
         self.registeredDevices = []
+        self.client = None
 
     def connect_mqtt(self):
         def on_connect(client, userdata, flags, rc):
@@ -25,10 +27,21 @@ class MqttController:
         client = mqtt_client.Client(client_id)
         client.on_connect = on_connect
         client.connect(broker, port)
+        self.client = client
         return client
 
+    def publish_message(self, msg):
+        topic = "fse2020/160121817/" + str(msg["comodo"])
+        print(topic)
 
-    def publish(self, client):
+        result = self.client.publish(topic, json.dumps(msg, indent = 4))
+        status = result[0]
+        if status == 0:
+            print(f"Send `{msg}` to topic `{topic}`")
+        else:
+            print(f"Failed to send message to topic {topic}")
+
+    def publish(self, client, msg):
         msg_count = 0
         while True:
             time.sleep(1)
@@ -59,7 +72,7 @@ class MqttController:
 
     def run_publish(self, client):
         client.loop_start()
-        self.publish(client)
+        self.publish(client, {})
 
     def run_subscribe(self, client, current_topic):
         def on_message(client, userdata, msg):
