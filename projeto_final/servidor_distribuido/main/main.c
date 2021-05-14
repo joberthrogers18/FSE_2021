@@ -23,9 +23,9 @@ void atualiza_dados_sensores(void * params){
     DHT11_init(GPIO_NUM_4);
     while(1) {
         if(DHT11_read().status >= 0){
-            printf("Temperature is %d \n", DHT11_read().temperature);
-            printf("Humidity is %d\n", DHT11_read().humidity);
-            printf("Status code is %d\n\n\n", DHT11_read().status);
+            // printf("Temperature is %d \n", DHT11_read().temperature);
+            // printf("Humidity is %d\n", DHT11_read().humidity);
+            // printf("Status code is %d\n\n\n", DHT11_read().status);
 
             char temperatura[sizeof(DHT11_read().temperature)];
             char umidade[sizeof(DHT11_read().humidity)];

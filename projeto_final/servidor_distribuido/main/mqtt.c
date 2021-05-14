@@ -19,14 +19,15 @@
 #include "mqtt_client.h"
 
 #include "mqtt.h"
+#include "nvs.h"
 
 #define TAG "MQTT"
 
 char * device_topic;
+uint8_t mac[6];
 
 void register_esp(){
-  uint8_t mac[6]; 
-  char mac_address[19]; 
+  char mac_address[19];
 
   esp_efuse_mac_get_default(mac);
   sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x",
@@ -81,6 +82,18 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
       if(strcmp(topic, device_topic)){
         printf("MENSAGEM NO CANAL DO DISPOSITIVO: %s\n", message);
+
+        char smac[6];
+        sprintf(smac, "%hhn", mac);
+
+        if(le_valor_nvs(smac) == -2){
+          ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
+          // CADASTRA DISPOSITIVO NVS
+          grava_valor_nvs(smac, message);
+        } else {
+          ESP_LOGI(TAG, "ESP CADASTRADA");
+        }
+
       }
 
       break;
