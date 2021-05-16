@@ -82,6 +82,7 @@
                 <div class="list-unregistered">
                     <span class="title-unregister-device">Dispositivos Não Registrados</span>
                     <div class="list-devices">
+                        <div id="warning-devices">Não há Dispositivos disponíveis no momento!</div>
                         <!-- <div class="device-unregistered">
                             <div>
                                 <span class="label-device">Dispositivo: </span>
@@ -300,6 +301,13 @@
             });
 
             socket.on("devices_unregistered", function(msg) {
+                if(msg.unregistered.length != 0) {
+                    var warningUnregistered = document.getElementById("warning-devices");
+                    if (warningUnregistered) {
+                        warningUnregistered.remove();
+                    }
+                }
+
                 msg.unregistered.forEach(item => {
                     var elementExists = document.getElementById(item);
                     if(!elementExists) {
@@ -319,8 +327,19 @@
                 var unregisterDevice = document.getElementById(`device-${idDeviceToRegister}`);
                 unregisterDevice.remove();
 
+                var listUnregistered = document.querySelector(".list-devices");
+
+                if (!listUnregistered.hasChildNodes()){
+                    var unregisteredWarning = document.createElement("div");
+                    unregisterDevice.setAttribute("id","warning-device");
+                    unregisterDevice.innerText = "Não há Dispositivos disponíveis no momento!";
+                    listUnregistered.appendChild(unregisteredWarning);
+               }
+
                 socket.emit('publish_channel', {
-                    "comodo": commoditieParser
+                    "comodo": commoditieParser,
+                    "id": idDeviceToRegister,
+                    "nome-comodo": commoditie
                 });
 
                 socket.on(`fse2020/160121817/${commoditieParser}/temperatura`, (msg) => {
@@ -338,10 +357,26 @@
                 });
             }
 
-            // socket.on("fse2020/160121817/sala/temperatura", function(msg) {
-            //     var umidadeSpan = document.getElementById("temperatura");
-            //     umidadeSpan.textContent = msg["temperatura"] + "C°";
-            // });
+            socket.on("register_devices", function(msg) {
+                msg.register.forEach(currentDevice => {
+                    var device = JSON.parse(currentDevice);
+                    newCommoditieRegister(device["nome-comodo"], device["comodo"])
+                
+                    socket.on(`fse2020/160121817/${device["comodo"]}/temperatura`, (msg) => {
+                        var temperatureSpan = document.getElementById(`temperature-${device["comodo"]}`);
+                        temperatureSpan.innerText = `${String(msg)} C°`;
+                    });
+    
+                    socket.on(`fse2020/160121817/${device["comodo"]}/umidade`, (msg) => {
+                        var temperatureSpan = document.getElementById(`humidity-${device["comodo"]}`);
+                        temperatureSpan.innerText = `${String(msg)} %`;
+                    });
+    
+                    socket.on(`fse2020/160121817/${device["comodo"]}/status`, (msg) => {
+                        console.log(`Status: ${msg}`);
+                    });
+                });
+            });
 
             // socket.on("fse2020/160121817/sala/umidade", function(msg) {
             //     var umidadeSpan = document.getElementById("umidade");

@@ -35,10 +35,17 @@ class MqttController:
         temperature_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/temperatura"
         humidity_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/umidade"
         status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/status"
+        # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/botao"
+        # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/led"
+        
+
 
         result = self.client.publish(topic, json.dumps({"comodo": msg["comodo"]}, indent = 4))
         status = result[0]
         if status == 0:
+            self.registeredDevices.append(json.dumps({"comodo": msg["comodo"], "id": msg["id"], "nome-comodo": msg["nome-comodo"]}))
+            self.registeredDevices = list(set(self.registeredDevices))
+            self.unregisteredDevices.remove(msg["id"])
             print(f"Send `{msg}` to topic `{topic}`")
             sub = threading.Thread(target=self.subscribe, args=(self.client, temperature_ref,))
             sub.start()
@@ -46,6 +53,8 @@ class MqttController:
             sub_2.start()
             sub_3 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
             sub_3.start()
+            # sub_4 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
+            # sub_4.start()
             sub.join()
             sub_2.join()
             sub_3.join()
@@ -69,13 +78,17 @@ class MqttController:
 
     def subscribe(self, client: mqtt_client, current_topic):
         def on_message(client, userdata, msg):
-            m_decode=str(msg.payload.decode("utf-8","ignore"))
-            data_jsonified = json.loads(m_decode)
+            try:
+                m_decode=str(msg.payload.decode("utf-8","ignore"))
+                data_jsonified = json.loads(m_decode)
+                
+                self.socketio.emit(
+                    str(msg.topic),
+                    data_jsonified["data"]
+                )
+            except:
+                print("Erro ao emitir dado")
 
-            self.socketio.emit(
-                str(msg.topic),
-                data_jsonified["data"]
-            )
 
             # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
@@ -128,15 +141,14 @@ class MqttController:
         devices = threading.Thread(target=self.run_subscribe_devices, args=(client_int, topic_device))
         devices.start()
         devices.join()
-        # sub = threading.Thread(target=self.run_subscribe, args=(client_int, temperature_ref,))
-        # sub.start()
-        # sub_2 = threading.Thread(target=self.run_subscribe, args=(client_int, humidity_ref,))
-        # sub_2.start()
-        # sub_3 = threading.Thread(target=self.run_subscribe, args=(client_int, status_ref,))
-        # sub_3.start()
         pub = threading.Thread(target=self.run_publish, args=(client_int,))
         pub.start()
         pub.join()
-        # sub.join()
-        # sub_2.join()
-        # sub_3.join()
+
+    def get_register_values(self):
+        self.socketio.emit(
+                "register_devices",
+                {
+                    'register': self.registeredDevices
+                }
+        )

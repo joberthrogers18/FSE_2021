@@ -121,3 +121,9 @@ body {
 .device-unregistered:hover {
     background-color: #DED;
 }
+
+#warning-devices {
+    text-align: center;
+    padding-top: 400px;
+    font-weight: bold;
+}

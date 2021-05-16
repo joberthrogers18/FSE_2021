@@ -17,6 +17,9 @@ class Route:
     def routes(self):
         @self.app.route('/')
         def main_route():
+            r = threading.Timer(3.0, self.mqtt.get_register_values, ())
+            r.start()
+            # self.mqtt.get_register_values()
             return render_template('start.html')
         
         @self.socketio.on('publish_channel')
