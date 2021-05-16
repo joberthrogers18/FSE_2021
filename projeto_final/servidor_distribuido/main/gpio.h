@@ -1,7 +1,7 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
-#define LED_1 2
+#define LED 2
 #define BOTAO 0
 
 void configuraBotao(int dispositivo);

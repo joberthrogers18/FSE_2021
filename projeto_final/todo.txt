@@ -1,5 +1,4 @@
-- Enviar dados como json
 - Enviar evento quando há clique no botão
-- Ligar led quando receber pedido
 - Fazer opção low power
+- Salvar nome da entrada e saída
 - Organizar código

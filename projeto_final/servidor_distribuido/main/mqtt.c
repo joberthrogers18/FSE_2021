@@ -22,10 +22,13 @@
 #include "nvs.h"
 #include "cJSON.h"
 #include "sensor.h"
+#include "gpio.h"
 
 #define TAG "MQTT"
 
-char * device_topic;
+char* btn_topic;
+char* device_topic;
+
 int esp_cadastrada;
 char smac[6];
 
@@ -43,25 +46,38 @@ void register_esp(){
   ESP_LOGI(TAG, "MAC ADDRESS: [%s]", mac_address);
   sprintf(smac, "%hhn", mac);
 
+  char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
+  sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
+  ESP_LOGI(TAG, "Topico: [%s]", topico);
+
   // verifica se a esp já está registrada na memória
   if(le_valor_nvs(smac, comodo) == -2){
     ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
     // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
-
-    char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
-    sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
-    
-    ESP_LOGI(TAG, "Topico: [%s]", topico);
-
     mqtt_envia_mensagem(topico, "Cadastro ESP");
     sleep(2);
-    mqtt_assinar_canal(ROOM_PATH);
+    mqtt_assinar_canal(ROOM_PATH, 1);
 
   } else {
     ESP_LOGI(TAG, "ESP CADASTRADA");
     ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo);
     xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo, 2, NULL);
   }
+
+  // padrão: fse2020/160121817/<mac_address>/botao
+  // padrão: fse2020/160121817/<mac_address>/led
+  char in_topic[strlen(topico) + strlen("/botao")];
+  char out_topic[strlen(topico) + strlen("/led")];
+
+  sprintf(in_topic, "%s%s", topico, "/botao");
+  sprintf(out_topic, "%s%s", topico, "/led");
+
+  btn_topic = in_topic;
+  
+  ESP_LOGI(TAG, "TÓPICO BOTÃO: %s", btn_topic);
+  ESP_LOGI(TAG, "TÓPICO LED: %s", out_topic);
+
+  mqtt_assinar_canal(out_topic, 0);
 }
 
 extern xSemaphoreHandle conexaoMQTTSemaphore;
@@ -92,23 +108,31 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
       ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
       break;
     case MQTT_EVENT_DATA:
-      ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-      memcpy(message, event->data, event->data_len);
-      memcpy(topic, event->topic, event->topic_len);
       message[event->data_len] = '\0';
 
-      if(strcmp(topic, device_topic)){
+      memcpy(topic, event->topic, event->topic_len);
+      ESP_LOGI(TAG, "MQTT_EVENT_DATA: %s", topic);
+
+      memcpy(message, event->data, event->data_len);
+
+      cJSON *jsonResponse = cJSON_Parse(message);
+
+      if(strstr(topic, "/led") != NULL){
+        ESP_LOGI(TAG, "LED: %s\n", message);
+        int estado_led = 0;
+        memcpy(&estado_led, (int *) &(cJSON_GetObjectItemCaseSensitive(jsonResponse, "data")->valueint), sizeof(int));
+        setNivelDispositivo(LED, estado_led);
+
+      } else {
         ESP_LOGI(TAG, "CÔMODO: %s\n", message);
 
-        // CADASTRA DISPOSITIVO NVS
         char comodo_json[COMODO_MAX_LENGTH_NAME] = {0};
-
-        cJSON *jsonResponse = cJSON_Parse(message);
         strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
         
+        // CADASTRA DISPOSITIVO NVS
         grava_valor_nvs(smac, comodo_json);
         xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo_json, 2, NULL);
-      }
+      } 
 
       break;
     case MQTT_EVENT_ERROR:
@@ -140,7 +164,9 @@ void mqtt_envia_mensagem(char* topico, char* mensagem){
   ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
 }
 
-void mqtt_assinar_canal(char* topico){
+void mqtt_assinar_canal(char* topico, int device){
   int id_msg_device = esp_mqtt_client_subscribe(client, topico, 0);
-  device_topic = topico;
+
+  if(device)
+    device_topic = topico;
 }

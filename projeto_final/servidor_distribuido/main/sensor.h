@@ -1,5 +1,5 @@
-#ifndef GPIO_H_
-#define GPIO_H_
+#ifndef SENSOR_H_
+#define SENSOR_H_
 
 #define MAX_SIZE_TOPIC_LENGTH 50
 
