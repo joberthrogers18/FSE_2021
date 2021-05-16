@@ -138,7 +138,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                            <button onclick="RegisterDevice()" type="button" class="btn btn-primary">Enviar</button>
+                            <button onclick="RegisterDevice()" type="button" class="btn btn-primary" data-dismiss="modal">Enviar</button>
                         </div>
                         </div>
                     </div>
@@ -158,6 +158,7 @@
                 
                 var deviceUnregistered = document.createElement("div");
                 deviceUnregistered.className = "device-unregistered";
+                deviceUnregistered.setAttribute("id", `device-${String(idDevice)}`);
                 
                 var divInfo = document.createElement("div");
                 
@@ -189,7 +190,7 @@
                 listUnregistered.appendChild(deviceUnregistered);
             }
 
-            function newCommoditieRegister() {
+            function newCommoditieRegister(commoditie, commoditieParser) {
                 var listRegistered = document.querySelector(".list-registered");
 
                 var deviceRegistered = document.createElement("div");
@@ -200,7 +201,7 @@
 
                 var nameTitle = document.createElement("span");
                 nameTitle.className = "name-title";
-                nameTitle.innerText = "Comodo";
+                nameTitle.innerText = commoditie;
 
                 var measureTemperature = document.createElement("div"); 
                 measureTemperature.className = "measure";
@@ -211,6 +212,7 @@
 
                 var temperature = document.createElement("span");
                 temperature.innerText = "?";
+                temperature.setAttribute("id", `temperature-${commoditieParser}`);
 
                 measureTemperature.appendChild(temperatureLabel);
                 measureTemperature.appendChild(temperature);
@@ -224,6 +226,7 @@
 
                 var humidity = document.createElement("span");
                 humidity.innerText = "?";
+                humidity.setAttribute("id", `humidity-${commoditieParser}`);
 
                 var actions = document.createElement("div");
                 actions.classList = "actions";
@@ -245,7 +248,7 @@
                 btnLed.classList = "btn-led";
 
                 btnLabelLed= document.createElement("span");
-                btnLabelLed.innerText = "Excluir";
+                btnLabelLed.innerText = "Ligar LED";
 
                 var iconLed = document.createElement("i");
                 iconLed.className = "fas fa-power-off";
@@ -281,20 +284,6 @@
                 return text;                 
             }
 
-            function RegisterDevice() {
-                var commoditie = document.getElementById("name-comodo").value;
-                var input = document.getElementById("name-input").value;
-                var output = document.getElementById("name-output").value;
-                
-                commoditie = removeAccent(String(commoditie));                
-
-                socket.emit('publish_channel', {
-                    "comodo": commoditie
-                });
-
-                console.log(commoditie, input, output, idDeviceToRegister);
-            }
-
             var socket = io(
                 {
                     reconnection: true,
@@ -318,6 +307,36 @@
                     }
                 });
             });
+
+            function RegisterDevice() {
+                var commoditie = document.getElementById("name-comodo").value;
+                var input = document.getElementById("name-input").value;
+                var output = document.getElementById("name-output").value;
+                
+                var commoditieParser = removeAccent(String(commoditie));  
+                
+                newCommoditieRegister(commoditie, commoditieParser);
+                var unregisterDevice = document.getElementById(`device-${idDeviceToRegister}`);
+                unregisterDevice.remove();
+
+                socket.emit('publish_channel', {
+                    "comodo": commoditieParser
+                });
+
+                socket.on(`fse2020/160121817/${commoditieParser}/temperatura`, (msg) => {
+                    var temperatureSpan = document.getElementById(`temperature-${commoditieParser}`);
+                    temperatureSpan.innerText = `${String(msg)} C°`;
+                });
+
+                socket.on(`fse2020/160121817/${commoditieParser}/umidade`, (msg) => {
+                    var temperatureSpan = document.getElementById(`humidity-${commoditieParser}`);
+                    temperatureSpan.innerText = `${String(msg)} %`;
+                });
+
+                socket.on(`fse2020/160121817/${commoditieParser}/status`, (msg) => {
+                    console.log(`Status: ${msg}`);
+                });
+            }
 
             // socket.on("fse2020/160121817/sala/temperatura", function(msg) {
             //     var umidadeSpan = document.getElementById("temperatura");

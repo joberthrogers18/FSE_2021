@@ -32,12 +32,23 @@ class MqttController:
 
     def publish_message(self, msg):
         topic = "fse2020/160121817/" + str(msg["comodo"])
-        print(topic)
+        temperature_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/temperatura"
+        humidity_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/umidade"
+        status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/status"
 
-        result = self.client.publish(topic, json.dumps(msg, indent = 4))
+        result = self.client.publish(topic, json.dumps({"comodo": msg["comodo"]}, indent = 4))
         status = result[0]
         if status == 0:
             print(f"Send `{msg}` to topic `{topic}`")
+            sub = threading.Thread(target=self.subscribe, args=(self.client, temperature_ref,))
+            sub.start()
+            sub_2 = threading.Thread(target=self.subscribe, args=(self.client, humidity_ref,))
+            sub_2.start()
+            sub_3 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
+            sub_3.start()
+            sub.join()
+            sub_2.join()
+            sub_3.join()
         else:
             print(f"Failed to send message to topic {topic}")
 
@@ -58,13 +69,14 @@ class MqttController:
 
     def subscribe(self, client: mqtt_client, current_topic):
         def on_message(client, userdata, msg):
-            print(current_topic)
-            # self.socketio.emit(
-            #     str(current_topic),
-            #     {
-            #         current_topic: msg.payload.decode()
-            #     }
-            # )
+            m_decode=str(msg.payload.decode("utf-8","ignore"))
+            data_jsonified = json.loads(m_decode)
+
+            self.socketio.emit(
+                str(msg.topic),
+                data_jsonified["data"]
+            )
+
             # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
         client.subscribe(current_topic)
