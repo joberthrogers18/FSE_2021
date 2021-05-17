@@ -14,102 +14,13 @@
         </head>
         <body>
             <div class="main-content">
+                <button style="visibility: hidden;" id="audioButton" onclick="play()">Play</button>
                 <div class="list-registered">
-                    <!-- <div class="device-register">
-                        <div class="device-info">
-                            <span class="name-title">Comodo 1</span>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span>
-                            </div>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <div class="btn-trash">
-                                <span>Excluir</span>
-                                <i style="color: #FFF;"  class="fas fa-trash"></i>
-                            </div>
-                            <div class="btn-led">
-                                <span>Ligar LED</span>
-                                <i style="color: #FFF;"  class="fas fa-power-off"></i>
-                            </div>
-                        </div>                   
-                    </div>
-                    <div class="device-register">
-                        <div class="device-info">
-                            <span class="name-title">Comodo 2</span>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
-                            </div>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <div class="btn-trash">
-                                <span>Excluir</span>
-                                <i style="color: #FFF;"  class="fas fa-trash"></i>
-                            </div>
-                            <div class="btn-led">
-                                <span>Ligar LED</span>
-                                <i style="color: #FFF;"  class="fas fa-power-off"></i>
-                            </div>
-                        </div>                    
-                    </div>
-                    <div class="device-register">                    
-                        <div class="device-info">
-                            <span class="name-title">Comodo 3</span>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Temperatura: </span> <span id="temperatura">?</span> <br>
-                            </div>
-                            <div class="measure">
-                                <span style="font-weight: bold;">Umidade: </span> <span id="umidade">?</span>
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <div class="btn-trash">
-                                <span>Excluir</span>
-                                <i style="color: #FFF;" class="fas fa-trash"></i>
-                            </div>
-                            <div class="btn-led">
-                                <span>Ligar LED</span>
-                                <i style="color: #FFF;" class="fas fa-power-off"></i>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="list-unregistered">
                     <span class="title-unregister-device">Dispositivos Não Registrados</span>
                     <div class="list-devices">
                         <div id="warning-devices">Não há Dispositivos disponíveis no momento!</div>
-                        <!-- <div class="device-unregistered">
-                            <div>
-                                <span class="label-device">Dispositivo: </span>
-                                <span class="label-device">1531321:</span>
-                            </div>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <div class="device-unregistered">
-                            <div>
-                                <span class="label-device">Dispositivo: </span>
-                                <span class="label-device">1531321</span>
-                            </div>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <div class="device-unregistered">
-                            <div>
-                                <span class="label-device">Dispositivo: </span>
-                                <span class="label-device">1531321</span>
-                            </div>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div> -->
                     </div>
                 </div>
                 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -326,6 +237,7 @@
                 var commoditie = document.getElementById("name-comodo").value;
                 var input = document.getElementById("name-input").value;
                 var output = document.getElementById("name-output").value;
+                const currentId = idDeviceToRegister; 
                 
                 var commoditieParser = removeAccent(String(commoditie));  
                 
@@ -361,7 +273,12 @@
                 socket.on(`fse2020/160121817/${commoditieParser}/status`, (msg) => {
                     console.log(`Status: ${msg}`);
                 });
+                
+                socket.on(`fse2020/160121817/dispositivos/${currentId}/botao`, (msg) => {
+                    play(commoditie);
+                });
             }
+
 
             socket.on("register_devices", function(msg) {
                 msg.register.forEach(currentDevice => {
@@ -378,11 +295,21 @@
                         temperatureSpan.innerText = `${String(msg)} %`;
                     });
     
+                    socket.on(`fse2020/160121817/dispositivos/${device["id"]}/botao`, (msg) => {
+                        play(device["comodo"]);
+                    });
+
                     socket.on(`fse2020/160121817/${device["comodo"]}/status`, (msg) => {
                         console.log(`Status: ${msg}`);
                     });
                 });
             });
+            
+            function play(commoditie) {
+                alert(`Alarme ativado no codo: ${commoditie}`);
+                var audio = new Audio('http://www.healthfreedomusa.org/downloads/iMovie.app/Contents/Resources/iMovie%20%2708%20Sound%20Effects/Alarm.mp3');
+                audio.play();
+            }
 
             function changeStateLED(stateLed, commoditie, macDevice) {
                 socket.emit('change_led_state', {
@@ -391,11 +318,6 @@
                     "mac-address": macDevice
                 });
             }
-
-            // socket.on("fse2020/160121817/sala/umidade", function(msg) {
-            //     var umidadeSpan = document.getElementById("umidade");
-            //     umidadeSpan.textContent = msg["umidade"] + "%";
-            // });
         </script>
     </body>
 </html>

@@ -35,8 +35,7 @@ class MqttController:
         temperature_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/temperatura"
         humidity_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/umidade"
         status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/status"
-        # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/botao"
-        # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/led"
+        button_ref = "fse2020/160121817/dispositivos/" + str(msg["id"]) + "/botao"
 
         result = self.client.publish(topic, json.dumps({"comodo": msg["comodo"]}, indent = 4))
         status = result[0]
@@ -49,13 +48,14 @@ class MqttController:
             sub.start()
             sub_2 = threading.Thread(target=self.subscribe, args=(self.client, humidity_ref,))
             sub_2.start()
-            sub_3 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
-            sub_3.start()
-            # sub_4 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
-            # sub_4.start()
+            sub_4 = threading.Thread(target=self.subscribe, args=(self.client, button_ref,))
+            sub_4.start()
+            # sub_3 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
+            # sub_3.start()
             sub.join()
             sub_2.join()
-            sub_3.join()
+            # sub_3.join()
+            sub_4.join()
         else:
             print(f"Failed to send message to topic {topic}")
 
@@ -87,6 +87,7 @@ class MqttController:
     def subscribe(self, client: mqtt_client, current_topic):
         def on_message(client, userdata, msg):
             try:
+                # print(current_topic)
                 m_decode=str(msg.payload.decode("utf-8","ignore"))
                 data_jsonified = json.loads(m_decode)
                 
