@@ -1,8 +1,10 @@
 import random
 import time
 import threading
-from paho.mqtt import client as mqtt_client
 import json
+from csv import writer
+from datetime import datetime
+from paho.mqtt import client as mqtt_client
 
 broker = 'test.mosquitto.org'
 port = 1883
@@ -16,6 +18,9 @@ class MqttController:
         self.unregisteredDevices = []
         self.registeredDevices = []
         self.client = None
+        with open("comandos.csv", "w") as f:
+            w = writer(f)
+            w.writerow(["horário", "comando", "comodo/MacAddress", "ação"])
 
     def connect_mqtt(self):
         def on_connect(client, userdata, flags, rc):
@@ -66,6 +71,11 @@ class MqttController:
         status = result[0]
         if status == 0:
             print(led_ref, {"data": data["led"]})
+            with open("comandos.csv", "a") as f:
+                w = writer(f)
+                now = datetime.now().strftime("%d/%m/%Y-%H:%M")
+                led_command = "Acendeu a saída" if (data["led"] == 1) else "Desligou a saída"
+                w.writerow([now, "LED", data["comodo"], led_command])
         else:
             print(f"Failed to send message to topic {topic}")
 
@@ -91,10 +101,17 @@ class MqttController:
                 m_decode=str(msg.payload.decode("utf-8","ignore"))
                 data_jsonified = json.loads(m_decode)
                 
+                if "/botao" in msg.topic:
+                    with open("comandos.csv", "a") as f:
+                        w = writer(f)
+                        now = datetime.now().strftime("%d/%m/%Y-%H:%M")
+                        w.writerow([now, "BOTÃO", msg.topic.split("/")[-2], "Botão Acionado"])
+
                 self.socketio.emit(
                     str(msg.topic),
                     data_jsonified["data"]
                 )
+
             except:
                 print("Erro ao emitir dado")
 
@@ -141,9 +158,6 @@ class MqttController:
         client.on_message = on_message
 
     def run(self):
-        temperature_ref = "fse2020/160121817/sala/temperatura"
-        humidity_ref = "fse2020/160121817/sala/umidade"
-        status_ref = "fse2020/160121817/sala/status"
         topic_device = "fse2020/160121817/dispositivos/+"
 
         client_int = self.connect_mqtt()
