@@ -41,12 +41,8 @@ void trataInterrupcaoBotao(void *params){
       int estado = gpio_get_level(pino);
       if(estado == 1){
         gpio_isr_handler_remove(pino);
-        while(gpio_get_level(pino) == estado){
-          vTaskDelay(50 / portTICK_PERIOD_MS);
-        }
 
         extern char btn_topic[200];
-
         ESP_LOGI(TAG, "BOTÃO CLICADO");
         mqtt_envia_mensagem(btn_topic, "{ \"data\": 1 }");
 
