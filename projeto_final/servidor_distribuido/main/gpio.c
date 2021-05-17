@@ -7,6 +7,9 @@
 #include "driver/gpio.h"
 
 #include "gpio.h"
+#include "mqtt.h"
+
+#define TAG "GPIO"
 
 xQueueHandle filaDeInterrupcao;
 int levelLED = 0;
@@ -30,7 +33,6 @@ void IRAM_ATTR gpio_isr_handler(void *args){
 
 void trataInterrupcaoBotao(void *params){
   int pino;
-  int contador = 0;
 
   while(true){
     if(xQueueReceive(filaDeInterrupcao, &pino, portMAX_DELAY)){
@@ -42,15 +44,10 @@ void trataInterrupcaoBotao(void *params){
           vTaskDelay(50 / portTICK_PERIOD_MS);
         }
 
-        contador++;
-        // Liga/desliga o led a cada clique
-        if(levelLED == 0){
-          setNivelDispositivo(GPIO_NUM_2, 1);
-          levelLED = 1;
-        } else {
-          setNivelDispositivo(GPIO_NUM_2, 0);
-          levelLED = 0;
-        }
+        char* btn_post = get_topico_botao();
+
+        ESP_LOGI(TAG, "BOTÃO CLICADO: %s", btn_post);
+        mqtt_envia_mensagem(btn_post, "{ \"data\": 1 }");
 
         // Habilitar novamente a interrupção
         vTaskDelay(50 / portTICK_PERIOD_MS);

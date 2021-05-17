@@ -16,5 +16,6 @@ void mqtt_start();
 void mqtt_envia_mensagem(char * topico, char * mensagem);
 void mqtt_assinar_canal(char* topico, int device);
 void register_esp();
+char* get_topico_botao();
 
 #endif

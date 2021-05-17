@@ -170,3 +170,7 @@ void mqtt_assinar_canal(char* topico, int device){
   if(device)
     device_topic = topico;
 }
+
+char* get_topico_botao(){
+  return btn_topic;
+}
