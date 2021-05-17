@@ -9,6 +9,7 @@
 #include "esp_sleep.h"
 
 #include "driver/rtc_io.h"
+#include "esp32/rom/uart.h"
 
 #include "../inc/gpio.h"
 #include "../inc/mqtt.h"
@@ -44,10 +45,6 @@ void trataInterrupcaoBotao(void *params){
       if(estado == 1){
         gpio_isr_handler_remove(pino);
 
-        while(rtc_gpio_get_level(pino) == estado){
-          vTaskDelay(50 / portTICK_PERIOD_MS);
-        }
-
         extern char btn_topic[200];
         ESP_LOGI(TAG, "BOTÃO CLICADO: %s", btn_topic);
 
@@ -58,9 +55,10 @@ void trataInterrupcaoBotao(void *params){
         gpio_isr_handler_add(pino, gpio_isr_handler, (void *) pino);
 
         // Trata saída do modo sleep
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        // printf("Entrando em modo Light Sleep\n");
-        // esp_light_sleep_start();
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        printf("Entrando em modo Light Sleep\n");
+        uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+        esp_light_sleep_start();
       }
     }
   }
@@ -86,13 +84,4 @@ void configuraBotao(int dispositivo){
 
   gpio_install_isr_service(0);
   gpio_isr_handler_add(dispositivo, gpio_isr_handler, (void *) dispositivo);
-}
-
-// MARK: led functions
-
-void configuraLed(int dispositivo){
-  // Configuração dos pinos dos LEDs 
-  gpio_pad_select_gpio(dispositivo);   
-  // Configura os pinos dos LEDs como Output
-  gpio_set_direction(dispositivo, GPIO_MODE_OUTPUT);
 }

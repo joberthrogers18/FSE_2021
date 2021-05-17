@@ -2,9 +2,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
+
 #include "esp_system.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "esp_sleep.h"
+#include "esp_log.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -15,8 +18,9 @@
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
 
-#include "esp_log.h"
+#include "driver/rtc_io.h"
 #include "mqtt_client.h"
+#include "esp32/rom/uart.h"
 
 #include "../inc/mqtt.h"
 #include "../inc/nvs.h"
@@ -25,16 +29,15 @@
 
 #define TAG "MQTT"
 
-char btn_topic[200] = {0};
 int btn_topic_len;
-
-char* device_topic;
 
 char smac[6];
 int esp_cadastrada;
 
+RTC_DATA_ATTR char btn_topic[200] = {0};
+RTC_DATA_ATTR esp_mqtt_client_handle_t client;
+
 extern xSemaphoreHandle conexaoMQTTSemaphore;
-esp_mqtt_client_handle_t client;
 
 void register_esp(){
   // obtem MAC ADDRESS
@@ -53,6 +56,12 @@ void register_esp(){
   char topico[sizeof(ADD_DEVICE_PATH) + sizeof(mac_address)];
   sprintf(topico, "%s%s", ADD_DEVICE_PATH, mac_address);
 
+  // padrão: fse2020/160121817/<mac_address>/botao
+  char in_topic[strlen(topico) + strlen("/botao")];
+  sprintf(in_topic, "%s%s", topico, "/botao");
+  btn_topic_len = strlen(in_topic);
+  memcpy(btn_topic, in_topic, btn_topic_len);
+
   // verifica se a esp já está registrada na memória
   if(le_valor_nvs(smac, comodo) == -2){
     ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
@@ -60,20 +69,17 @@ void register_esp(){
     // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
     mqtt_envia_mensagem(topico, "{ \"data\": \"Cadastro ESP\" }");
     sleep(2);
-    mqtt_assinar_canal(ROOM_PATH, 1);
+    mqtt_assinar_canal(ROOM_PATH);
   }
+}
 
-  // padrão: fse2020/160121817/<mac_address>/botao
-  // padrão: fse2020/160121817/<mac_address>/led
-  char in_topic[strlen(topico) + strlen("/botao")];
-  char out_topic[strlen(topico) + strlen("/led")];
-
-  sprintf(in_topic, "%s%s", topico, "/botao");
-  sprintf(out_topic, "%s%s", topico, "/led");
-
-  btn_topic_len = strlen(in_topic);
-  memcpy(btn_topic, in_topic, btn_topic_len);
-  mqtt_assinar_canal(out_topic, 0);
+void ativa_sleep(){
+  // LOW POWER
+  printf("Entrando em modo Light Sleep\n");
+  // Configura o modo sleep somente após completar a escrita na UART para finalizar o printf
+  uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);
+  // Entra em modo Light Sleep
+  esp_light_sleep_start();
 }
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
@@ -107,11 +113,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
 
       cJSON *jsonResponse = cJSON_Parse(message);
 
-      if(strstr(topic, "/led") != NULL){
-        int estado_led = 0;
-        memcpy(&estado_led, (int *) &(cJSON_GetObjectItemCaseSensitive(jsonResponse, "data")->valueint), sizeof(int));
-        setNivelDispositivo(LED, estado_led);
-      } else {
+      if(strstr(message, "comodo") != NULL){
         char comodo_json[COMODO_MAX_LENGTH_NAME] = {0};
         strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
         // CADASTRA DISPOSITIVO NVS
@@ -148,9 +150,6 @@ void mqtt_envia_mensagem(char* topico, char* mensagem){
   ESP_LOGI(TAG, "Mensagem enviada, ID: %d", message_id);
 }
 
-void mqtt_assinar_canal(char* topico, int device){
+void mqtt_assinar_canal(char* topico){
   esp_mqtt_client_subscribe(client, topico, 0);
-
-  if(device)
-    device_topic = topico;
 }
