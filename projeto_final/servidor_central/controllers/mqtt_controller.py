@@ -37,8 +37,6 @@ class MqttController:
         status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/status"
         # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/botao"
         # status_ref = "fse2020/160121817/" + str(msg["comodo"]) + "/led"
-        
-
 
         result = self.client.publish(topic, json.dumps({"comodo": msg["comodo"]}, indent = 4))
         status = result[0]
@@ -58,6 +56,16 @@ class MqttController:
             sub.join()
             sub_2.join()
             sub_3.join()
+        else:
+            print(f"Failed to send message to topic {topic}")
+
+    def changeLedStatus(self, data):
+        led_ref = "fse2020/160121817/dispositivos/" + str(data["mac-address"]) + "/led"
+
+        result = self.client.publish(led_ref, json.dumps({"data": data["led"]}, indent = 4))
+        status = result[0]
+        if status == 0:
+            print(led_ref, {"data": data["led"]})
         else:
             print(f"Failed to send message to topic {topic}")
 

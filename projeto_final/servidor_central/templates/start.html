@@ -191,7 +191,9 @@
                 listUnregistered.appendChild(deviceUnregistered);
             }
 
-            function newCommoditieRegister(commoditie, commoditieParser) {
+            function newCommoditieRegister(commoditie, commoditieParser, macDevice) {
+                var stateLED = false;
+
                 var listRegistered = document.querySelector(".list-registered");
 
                 var deviceRegistered = document.createElement("div");
@@ -247,6 +249,10 @@
 
                 var btnLed = document.createElement("div");
                 btnLed.classList = "btn-led";
+                btnLed.addEventListener('click', function(){ 
+                    stateLED = !stateLED;
+                    changeStateLED(stateLED, commoditieParser, macDevice);
+                }, false);
 
                 btnLabelLed= document.createElement("span");
                 btnLabelLed.innerText = "Ligar LED";
@@ -323,7 +329,7 @@
                 
                 var commoditieParser = removeAccent(String(commoditie));  
                 
-                newCommoditieRegister(commoditie, commoditieParser);
+                newCommoditieRegister(commoditie, commoditieParser, idDeviceToRegister);
                 var unregisterDevice = document.getElementById(`device-${idDeviceToRegister}`);
                 unregisterDevice.remove();
 
@@ -360,7 +366,7 @@
             socket.on("register_devices", function(msg) {
                 msg.register.forEach(currentDevice => {
                     var device = JSON.parse(currentDevice);
-                    newCommoditieRegister(device["nome-comodo"], device["comodo"])
+                    newCommoditieRegister(device["nome-comodo"], device["comodo"], device["id"])
                 
                     socket.on(`fse2020/160121817/${device["comodo"]}/temperatura`, (msg) => {
                         var temperatureSpan = document.getElementById(`temperature-${device["comodo"]}`);
@@ -377,6 +383,14 @@
                     });
                 });
             });
+
+            function changeStateLED(stateLed, commoditie, macDevice) {
+                socket.emit('change_led_state', {
+                    "led": stateLed ? 1 : 0,
+                    "comodo": commoditie,
+                    "mac-address": macDevice
+                });
+            }
 
             // socket.on("fse2020/160121817/sala/umidade", function(msg) {
             //     var umidadeSpan = document.getElementById("umidade");

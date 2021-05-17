@@ -25,3 +25,7 @@ class Route:
         @self.socketio.on('publish_channel')
         def on_publish_device(data):
             self.mqtt.publish_message(data)
+
+        @self.socketio.on('change_led_state')
+        def change_led_state(data):
+            self.mqtt.changeLedStatus(data)
