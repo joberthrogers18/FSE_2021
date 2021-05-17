@@ -1,0 +1,9 @@
+version: '2'
+services:
+    app:
+        container_name: 'trabalho_final_fse'
+        build: .
+        ports:
+            - '3333:3333'
+        volumes:
+            - '.:/app'
