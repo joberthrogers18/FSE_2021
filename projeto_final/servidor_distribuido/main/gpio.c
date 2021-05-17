@@ -12,6 +12,7 @@
 #define TAG "GPIO"
 
 xQueueHandle filaDeInterrupcao;
+
 int levelLED = 0;
 
 // MARK: general functions
@@ -44,10 +45,10 @@ void trataInterrupcaoBotao(void *params){
           vTaskDelay(50 / portTICK_PERIOD_MS);
         }
 
-        char* btn_post = get_topico_botao();
+        extern char btn_topic[200];
 
-        ESP_LOGI(TAG, "BOTÃO CLICADO: %s", btn_post);
-        mqtt_envia_mensagem(btn_post, "{ \"data\": 1 }");
+        ESP_LOGI(TAG, "BOTÃO CLICADO");
+        mqtt_envia_mensagem(btn_topic, "{ \"data\": 1 }");
 
         // Habilitar novamente a interrupção
         vTaskDelay(50 / portTICK_PERIOD_MS);

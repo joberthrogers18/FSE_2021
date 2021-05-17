@@ -9,13 +9,11 @@
 // Recebe cadastro do dispositivo pelo servidor central 
 // Padrão: fse2020/160121817/<cômodo>
 #define ROOM_PATH "fse2020/160121817/+"
-
 #define ADD_DEVICE_PATH "fse2020/160121817/dispositivos/"
 
 void mqtt_start();
 void mqtt_envia_mensagem(char * topico, char * mensagem);
 void mqtt_assinar_canal(char* topico, int device);
 void register_esp();
-char* get_topico_botao();
 
 #endif

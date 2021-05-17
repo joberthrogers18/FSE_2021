@@ -26,17 +26,22 @@
 
 #define TAG "MQTT"
 
-char* btn_topic;
+char btn_topic[200] = {0};
+int btn_topic_len;
+
 char* device_topic;
 
-int esp_cadastrada;
 char smac[6];
+int esp_cadastrada;
+
+extern xSemaphoreHandle conexaoMQTTSemaphore;
+esp_mqtt_client_handle_t client;
 
 void register_esp(){
   // obtem MAC ADDRESS
+  char comodo[COMODO_MAX_LENGTH_NAME] = {0};
   char mac_address[19];
   uint8_t mac[6];
-  char comodo[COMODO_MAX_LENGTH_NAME] = {0};
 
   esp_efuse_mac_get_default(mac);
   sprintf(mac_address ,"%02x:%02x:%02x:%02x:%02x:%02x",
@@ -53,6 +58,7 @@ void register_esp(){
   // verifica se a esp já está registrada na memória
   if(le_valor_nvs(smac, comodo) == -2){
     ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
+    
     // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
     mqtt_envia_mensagem(topico, "Cadastro ESP");
     sleep(2);
@@ -72,16 +78,14 @@ void register_esp(){
   sprintf(in_topic, "%s%s", topico, "/botao");
   sprintf(out_topic, "%s%s", topico, "/led");
 
-  btn_topic = in_topic;
+  btn_topic_len = strlen(in_topic);
+  memcpy(btn_topic, in_topic, btn_topic_len);
   
-  ESP_LOGI(TAG, "TÓPICO BOTÃO: %s", btn_topic);
+  ESP_LOGI(TAG, "TÓPICO BOTÃO: %s - %d", btn_topic, btn_topic_len);
   ESP_LOGI(TAG, "TÓPICO LED: %s", out_topic);
 
   mqtt_assinar_canal(out_topic, 0);
 }
-
-extern xSemaphoreHandle conexaoMQTTSemaphore;
-esp_mqtt_client_handle_t client;
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
   esp_mqtt_client_handle_t client = event->client;
@@ -169,8 +173,4 @@ void mqtt_assinar_canal(char* topico, int device){
 
   if(device)
     device_topic = topico;
-}
-
-char* get_topico_botao(){
-  return btn_topic;
 }
