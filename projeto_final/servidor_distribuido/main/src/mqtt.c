@@ -18,11 +18,11 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
-#include "mqtt.h"
-#include "nvs.h"
-#include "cJSON.h"
-#include "sensor.h"
-#include "gpio.h"
+#include "../inc/mqtt.h"
+#include "../inc/nvs.h"
+#include "../inc/cJSON.h"
+#include "../inc/sensor.h"
+#include "../inc/gpio.h"
 
 #define TAG "MQTT"
 
@@ -88,9 +88,6 @@ void register_esp(){
 }
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
-  esp_mqtt_client_handle_t client = event->client;
-  int msg_id;
-
   char message[event->data_len];
   char topic[event->topic_len];
   
@@ -169,7 +166,7 @@ void mqtt_envia_mensagem(char* topico, char* mensagem){
 }
 
 void mqtt_assinar_canal(char* topico, int device){
-  int id_msg_device = esp_mqtt_client_subscribe(client, topico, 0);
+  esp_mqtt_client_subscribe(client, topico, 0);
 
   if(device)
     device_topic = topico;

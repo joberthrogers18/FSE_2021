@@ -7,7 +7,7 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 
-#include "nvs.h"
+#include "../inc/nvs.h"
 
 #define TAG "NVS"
 

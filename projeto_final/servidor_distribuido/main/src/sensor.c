@@ -7,10 +7,10 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
-#include "mqtt.h"
-#include "dht11.h"
-#include "sensor.h"
-#include "cJSON.h"
+#include "../inc/mqtt.h"
+#include "../inc/dht11.h"
+#include "../inc/sensor.h"
+#include "../inc/cJSON.h"
 
 #define TAG "SENSOR"
 

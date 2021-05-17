@@ -1,4 +1,4 @@
-set(COMPONENT_SRCS "main.c dht11.c gpio.c wifi.c mqtt.c nvs.c cJSON.c sensor.c")
+set(COMPONENT_SRCS "src/main.c src/dht11.c src/gpio.c src/wifi.c src/mqtt.c src/nvs.c src/cJSON.c src/sensor.c")
 set(COMPONENT_ADD_INCLUDEDIRS ".")
 
 register_component()

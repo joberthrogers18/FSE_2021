@@ -28,7 +28,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "dht11.h"
+#include "../inc/dht11.h"
 
 static gpio_num_t dht_gpio;
 static int64_t last_read_time = -2000000;

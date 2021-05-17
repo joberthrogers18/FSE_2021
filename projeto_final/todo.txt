@@ -1,4 +1,2 @@
-- Enviar evento quando há clique no botão
 - Fazer opção low power
 - Salvar nome da entrada e saída
-- Organizar código

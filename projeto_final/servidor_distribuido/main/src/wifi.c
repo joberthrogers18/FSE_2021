@@ -12,8 +12,8 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#include "wifi.h"
-#include "mqtt.h"
+#include "../inc/wifi.h"
+#include "../inc/mqtt.h"
 
 #define WIFI_SSID      CONFIG_ESP_WIFI_SSID
 #define WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD

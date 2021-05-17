@@ -8,10 +8,10 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 
-#include "gpio.h"
-#include "mqtt.h"
-#include "wifi.h"
-#include "nvs.h"
+#include "../inc/gpio.h"
+#include "../inc/mqtt.h"
+#include "../inc/wifi.h"
+#include "../inc/nvs.h"
 
 #define TAG "Main"
 #define FLOAT_SIZE_MAX 318

@@ -6,8 +6,8 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 
-#include "gpio.h"
-#include "mqtt.h"
+#include "../inc/gpio.h"
+#include "../inc/mqtt.h"
 
 #define TAG "GPIO"
 
