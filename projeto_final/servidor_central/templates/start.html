@@ -150,13 +150,14 @@
                 
                 btnLabelTrash = document.createElement("span");
                 btnLabelTrash.innerText = "Excluir";
-
+                
                 var iconTrash = document.createElement("i");
                 iconTrash.className = "fas fa-trash";
                 iconTrash.style.color = "#fff";
-
+                
                 btnTrash.appendChild(btnLabelTrash);
                 btnTrash.appendChild(iconTrash);
+                btnTrash.style.visibility = "hidden";
 
                 var btnLed = document.createElement("div");
                 btnLed.classList = "btn-led";
@@ -166,7 +167,8 @@
                 }, false);
 
                 btnLabelLed= document.createElement("span");
-                btnLabelLed.innerText = "Ligar LED";
+                btnLabelLed.innerText = "Ligar Saída";
+                btnLabelLed.setAttribute("id", `span-${macDevice}`);
 
                 var iconLed = document.createElement("i");
                 iconLed.className = "fas fa-power-off";
@@ -312,6 +314,14 @@
             }
 
             function changeStateLED(stateLed, commoditie, macDevice) {
+                var spanLed = document.getElementById(`span-${macDevice}`);
+                
+                if(stateLed) {
+                    spanLed.innerText = "Desligar Saída";
+                } else {
+                    spanLed.innerText = "Ligar Saída";
+                }
+                
                 socket.emit('change_led_state', {
                     "led": stateLed ? 1 : 0,
                     "comodo": commoditie,
