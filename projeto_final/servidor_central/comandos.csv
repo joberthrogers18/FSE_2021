@@ -1,11 +1,4 @@
 horário,comando,comodo/MacAddress,ação
-17/05/2021-17:50,LED,teste,Acendeu a saída
-17/05/2021-17:50,LED,teste,Desligou a saída
-17/05/2021-17:54,LED,teste,Acendeu a saída
-17/05/2021-17:54,LED,teste,Desligou a saída
-17/05/2021-17:55,LED,teste,Acendeu a saída
-17/05/2021-17:55,LED,teste,Desligou a saída
-17/05/2021-17:56,LED,teste,Acendeu a saída
-17/05/2021-17:56,LED,teste,Desligou a saída
-17/05/2021-17:56,LED,teste,Acendeu a saída
-17/05/2021-17:56,LED,teste,Desligou a saída
+17/05/2021-21:13,LED,treasure,Acendeu a saída
+17/05/2021-21:13,LED,treasure,Desligou a saída
+17/05/2021-21:13,BOTÃO,b8:f0:09:cd:4a:3c,Botão Acionado

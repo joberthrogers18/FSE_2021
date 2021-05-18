@@ -47,7 +47,6 @@ class MqttController:
         if status == 0:
             self.registeredDevices.append(json.dumps({"comodo": msg["comodo"], "id": msg["id"], "nome-comodo": msg["nome-comodo"]}))
             self.registeredDevices = list(set(self.registeredDevices))
-            self.unregisteredDevices.remove(msg["id"])
             print(f"Send `{msg}` to topic `{topic}`")
             sub = threading.Thread(target=self.subscribe, args=(self.client, temperature_ref,))
             sub.start()
@@ -55,11 +54,8 @@ class MqttController:
             sub_2.start()
             sub_4 = threading.Thread(target=self.subscribe, args=(self.client, button_ref,))
             sub_4.start()
-            # sub_3 = threading.Thread(target=self.subscribe, args=(self.client, status_ref,))
-            # sub_3.start()
             sub.join()
             sub_2.join()
-            # sub_3.join()
             sub_4.join()
         else:
             print(f"Failed to send message to topic {topic}")
@@ -85,12 +81,6 @@ class MqttController:
             time.sleep(1)
             msg = f"messages: {msg_count}"
             result = client.publish(topic, msg)
-            # result: [0, 1]
-            status = result[0]
-            # if status == 0:
-            #     print(f"Send `{msg}` to topic `{topic}`")
-            # else:
-            #     print(f"Failed to send message to topic {topic}")
             msg_count += 1
 
 
@@ -115,9 +105,6 @@ class MqttController:
             except:
                 print("Erro ao emitir dado")
 
-
-            # print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-
         client.subscribe(current_topic)
         client.on_message = on_message
 
@@ -128,12 +115,6 @@ class MqttController:
     def run_subscribe(self, client, current_topic):
         def on_message(client, userdata, msg):
             name_topic = str(msg.topic).split("/")[-1]
-            # self.socketio.emit(
-            #     str(msg.topic),
-            #     {
-            #         name_topic: msg.payload.decode("utf-8")
-            #     }
-            # )
             print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
         client.subscribe(current_topic)
@@ -141,10 +122,17 @@ class MqttController:
 
     def run_subscribe_devices(self, client, current_topic):
         def on_message(client, userdata, msg):
-            name_topic = str(msg.topic).split("/")[-1]
+            mac_address = str(msg.topic).split("/")[-1]
 
-            if name_topic not in self.unregisteredDevices and name_topic not in self.registeredDevices:
-                self.unregisteredDevices.append(name_topic)
+            m_decode=str(msg.payload.decode("utf-8","ignore"))
+            data_jsonified = json.loads(m_decode)
+
+            # if mac_address not in self.unregisteredDevices and mac_address not in self.registeredDevices:
+            if not [item for item in self.unregisteredDevices if item['mac_address'] == mac_address] and not [item for item in self.registeredDevices if item['mac_address'] == mac_address]:
+                self.unregisteredDevices.append({
+                    "mac_address": mac_address,
+                    "lowPower": data_jsonified["data"]["lowMode"]
+                })
 
             self.socketio.emit(
                 "devices_unregistered",

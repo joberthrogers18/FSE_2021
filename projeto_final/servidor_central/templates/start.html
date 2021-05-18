@@ -63,9 +63,10 @@
         <script type="text/javascript" charset="utf-8">
 
             var idDeviceToRegister = null;
+            var currentLowerPower = false;
             var deviceUnregistered = [];
 
-            function newDeviceUnRegistered(idDevice) {
+            function newDeviceUnRegistered(idDevice, lowPower) {
                 var listUnregistered = document.querySelector(".list-devices");
                 
                 var deviceUnregistered = document.createElement("div");
@@ -92,6 +93,7 @@
                 button.className = "btn btn-primary";
                 button.addEventListener('click', function(){ 
                     idDeviceToRegister = idDevice;
+                    currentLowerPower = lowPower;
                 }, false);
                 button.appendChild(icon);
                 
@@ -192,6 +194,38 @@
                 listRegistered.appendChild(deviceRegistered);
             }
 
+            function newCommoditieLowPower(commoditie, commoditieParser, macDevice) {
+                var listRegistered = document.querySelector(".list-registered");
+
+                var deviceRegistered = document.createElement("div");
+                deviceRegistered.className = "device-register-low-power";
+
+                var deviceInfo = document.createElement("div");
+                deviceInfo.className = "name-title";
+
+                var nameTitle = document.createElement("span");
+                nameTitle.className = "name-title";
+                nameTitle.innerText = commoditie;
+
+                var lowPower = document.createElement("div");
+                lowPower.className = "lower-power";
+
+                var iconBatteries = document.createElement("i");
+                iconBatteries.className = "fas fa-battery-three-quarters fa-2x";
+
+                var lowPowerSpan = document.createElement("span");
+                lowPowerSpan.innerText = "Dispositivo Ligado a Bateria";
+
+                lowPower.appendChild(iconBatteries);
+                lowPower.appendChild(lowPowerSpan);
+
+                deviceInfo.appendChild(nameTitle);
+
+                deviceRegistered.appendChild(deviceInfo);
+                deviceRegistered.appendChild(lowPower);
+                listRegistered.appendChild(deviceRegistered);
+            }
+
             function removeAccent(text)
             {       
                 text = text.toLowerCase().replaceAll(" ", "_");                                                         
@@ -230,7 +264,7 @@
                 msg.unregistered.forEach(item => {
                     var elementExists = document.getElementById(item);
                     if(!elementExists) {
-                        newDeviceUnRegistered(item);
+                        newDeviceUnRegistered(item["mac_address"], item["lowPower"]);
                     }
                 });
             });
@@ -243,7 +277,12 @@
                 
                 var commoditieParser = removeAccent(String(commoditie));  
                 
-                newCommoditieRegister(commoditie, commoditieParser, idDeviceToRegister);
+                if (currentLowerPower) {
+                    newCommoditieLowPower(commoditie, commoditieParser, idDeviceToRegister);
+                } else {
+                    newCommoditieRegister(commoditie, commoditieParser, idDeviceToRegister);
+                }
+
                 var unregisterDevice = document.getElementById(`device-${idDeviceToRegister}`);
                 unregisterDevice.remove();
 
@@ -262,19 +301,21 @@
                     "nome-comodo": commoditie
                 });
 
-                socket.on(`fse2020/160121817/${commoditieParser}/temperatura`, (msg) => {
-                    var temperatureSpan = document.getElementById(`temperature-${commoditieParser}`);
-                    temperatureSpan.innerText = `${String(msg)} C°`;
-                });
-
-                socket.on(`fse2020/160121817/${commoditieParser}/umidade`, (msg) => {
-                    var temperatureSpan = document.getElementById(`humidity-${commoditieParser}`);
-                    temperatureSpan.innerText = `${String(msg)} %`;
-                });
-
-                socket.on(`fse2020/160121817/${commoditieParser}/status`, (msg) => {
-                    console.log(`Status: ${msg}`);
-                });
+                if (!currentLowerPower){
+                    socket.on(`fse2020/160121817/${commoditieParser}/temperatura`, (msg) => {
+                        var temperatureSpan = document.getElementById(`temperature-${commoditieParser}`);
+                        temperatureSpan.innerText = `${String(msg)} C°`;
+                    });
+    
+                    socket.on(`fse2020/160121817/${commoditieParser}/umidade`, (msg) => {
+                        var temperatureSpan = document.getElementById(`humidity-${commoditieParser}`);
+                        temperatureSpan.innerText = `${String(msg)} %`;
+                    });
+    
+                    socket.on(`fse2020/160121817/${commoditieParser}/status`, (msg) => {
+                        console.log(`Status: ${msg}`);
+                    });
+                }
                 
                 socket.on(`fse2020/160121817/dispositivos/${currentId}/botao`, (msg) => {
                     play(commoditie);
@@ -308,7 +349,7 @@
             });
             
             function play(commoditie) {
-                alert(`Alarme ativado no codo: ${commoditie}`);
+                alert(`Alarme ativado no cômodo: ${commoditie}`);
                 var audio = new Audio('http://www.healthfreedomusa.org/downloads/iMovie.app/Contents/Resources/iMovie%20%2708%20Sound%20Effects/Alarm.mp3');
                 audio.play();
             }

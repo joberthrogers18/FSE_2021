@@ -1,1 +1,8 @@
 - Fazer opção low power (+/-)
+- Fazer opção low power
+- Salvar nome da entrada e saída
+
+
+Joberth
+- remover a exclusão
+- Dockerizar front
