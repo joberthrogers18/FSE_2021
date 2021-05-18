@@ -1,2 +1,1 @@
-- Fazer opção low power
-- Salvar nome da entrada e saída
+- Fazer opção low power (+/-)

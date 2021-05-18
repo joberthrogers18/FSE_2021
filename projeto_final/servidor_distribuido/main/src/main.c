@@ -19,8 +19,6 @@
 #define clear() printf("\e[1;1H\e[2J")
 
 void app_main(){
-    configuraLed(LED);
-    configuraBotao(BOTAO);
     // configura wifi
     // conecta na rede
     // se a conexão funcionar, inicia a conexão MQTT

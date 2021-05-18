@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -31,7 +31,7 @@
 
 int btn_topic_len;
 
-char smac[6];
+RTC_DATA_ATTR char smac[6];
 int esp_cadastrada;
 
 RTC_DATA_ATTR char btn_topic[200] = {0};
@@ -63,13 +63,22 @@ void register_esp(){
   memcpy(btn_topic, in_topic, btn_topic_len);
 
   // verifica se a esp já está registrada na memória
+  ESP_LOGI(TAG, "CHAVE: %s", smac);
   if(le_valor_nvs(smac, comodo) == -2){
     ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
     
     // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
-    mqtt_envia_mensagem(topico, "{ \"data\": \"Cadastro ESP\" }");
+    cJSON *json = cJSON_CreateObject();
+    cJSON *data = cJSON_CreateObject();
+
+    cJSON_AddItemToObject(data, "lowMode", cJSON_CreateBool(cJSON_True));
+    cJSON_AddItemToObject(json, "data", data);
+
+    mqtt_envia_mensagem(topico, cJSON_Print(json));
     sleep(2);
     mqtt_assinar_canal(ROOM_PATH);
+  } else {
+    configuraBotao(BOTAO);
   }
 }
 
@@ -118,6 +127,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
         strcpy(comodo_json, cJSON_GetObjectItemCaseSensitive(jsonResponse, "comodo")->valuestring);
         // CADASTRA DISPOSITIVO NVS
         grava_valor_nvs(smac, comodo_json);
+        configuraBotao(BOTAO);
       } 
 
       break;

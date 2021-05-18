@@ -13,6 +13,7 @@
 
 #include "../inc/gpio.h"
 #include "../inc/mqtt.h"
+#include "../inc/cJSON.h"
 
 #define TAG "RTCIO"
 
@@ -48,13 +49,14 @@ void trataInterrupcaoBotao(void *params){
         extern char btn_topic[200];
         ESP_LOGI(TAG, "BOTÃO CLICADO: %s", btn_topic);
 
-        mqtt_envia_mensagem(btn_topic, "{ \"data\": 1 }");
+        cJSON *json = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "data", cJSON_CreateNumber(1));
+        mqtt_envia_mensagem(btn_topic, cJSON_Print(json));
 
         // Habilitar novamente a interrupção
         vTaskDelay(50 / portTICK_PERIOD_MS);
         gpio_isr_handler_add(pino, gpio_isr_handler, (void *) pino);
 
-        // Trata saída do modo sleep
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         printf("Entrando em modo Light Sleep\n");
         uart_tx_wait_idle(CONFIG_ESP_CONSOLE_UART_NUM);

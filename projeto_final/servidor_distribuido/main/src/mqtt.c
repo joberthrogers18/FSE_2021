@@ -60,7 +60,12 @@ void register_esp(){
     ESP_LOGI(TAG, "ESP NÃO CADASTRADA");
     
     // Gera o tópico com o MAC ADDRESS para solicitação de cadastro
-    mqtt_envia_mensagem(topico, "Cadastro ESP");
+    cJSON *json = cJSON_CreateObject();
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddFalseToObject(data, "lowMode");
+    cJSON_AddItemToObject(json, "data", data);
+
+    mqtt_envia_mensagem(topico, cJSON_Print(json));
     sleep(2);
     mqtt_assinar_canal(ROOM_PATH, 1);
 
@@ -68,6 +73,9 @@ void register_esp(){
     ESP_LOGI(TAG, "ESP CADASTRADA");
     ESP_LOGI(TAG, "COMODO RECUPERADO: %s", comodo);
     xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo, 2, NULL);
+
+    configuraLed(LED);
+    configuraBotao(BOTAO);
   }
 
   // padrão: fse2020/160121817/<mac_address>/botao
@@ -133,6 +141,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event){
         // CADASTRA DISPOSITIVO NVS
         grava_valor_nvs(smac, comodo_json);
         xTaskCreate(&atualiza_dados_sensores, "Leitura de Sensores", 2048, (void *)comodo_json, 2, NULL);
+
+        configuraLed(LED);
+        configuraBotao(BOTAO);
+
       } 
 
       break;
