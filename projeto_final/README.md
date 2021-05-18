@@ -1,5 +1,9 @@
 # Trabalho Final de Fundamentos de Sistema Embarcados
 
+## Link para o Vídeo do Projeto
+
+[Link para o Vídeo](https://www.youtube.com/watch?v=gN2Q8M9hmcA)
+
 ## Alunos
 
 | Aluno | Matrícula |
